@@ -1,0 +1,25 @@
+.KnowledgeListWrap {
+  flex: 0 0 280px;
+}
+.chatPageWrap {
+  height: calc(100vh - 56px);
+  flex: 1;
+
+  .chatContainerWrap {
+    position: relative;
+    overflow-y: scroll;
+    height: calc(100vh - 206px);
+    padding: 0 15px;
+  }
+  .MessageInputWrap {
+    margin-top: 10px;
+    position: relative;
+    height: 160px;
+    padding: 0 15px;
+  }
+}
+@media screen and (max-width: 768px) {
+  .KnowledgeListWrap {
+    display: none;
+  }
+}
