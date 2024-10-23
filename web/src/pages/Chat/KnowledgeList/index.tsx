@@ -18,14 +18,8 @@ import { api_list_knowledge_base } from '@/services';
 const Admin: React.FC = () => {
   const intl = useIntl();
 
-  const [list, setList] = useState([]);
-
-  useEffect(() => {
-    api_list_knowledge_base().then((res: any) => {
-      console.log('api_list_knowledge_base', res);
-      setList(res?.data || []);
-    });
-  }, []);
+  const { knowledgeList, setKnowledgeList, knowledgeListSelect, setKnowledgeListSelect } =
+    useModel('chat');
   return (
     <div className={styles.knowledgeList}>
       <Space.Compact style={{ width: '100%', marginBottom: 30 }}>
@@ -37,7 +31,7 @@ const Admin: React.FC = () => {
           新建
         </Button>
       </Space.Compact>
-      {list?.map((item: any) => {
+      {knowledgeList?.map((item: any) => {
         return (
           <Popover
             key={item.kb_id}
@@ -62,7 +56,25 @@ const Admin: React.FC = () => {
             title={null}
             trigger="hover"
           >
-            <div className={styles.knowledgeListItem}>{item.kb_name}</div>
+            <div
+              className={classNames(
+                styles.knowledgeListItem,
+                knowledgeListSelect.includes(item.kb_id) && styles.knowledgeListItem_select,
+              )}
+              onClick={() => {
+                console.log('click knowledgeListItem', item.kb_id);
+                if (knowledgeListSelect.includes(item.kb_id)) {
+                  const _selectList = knowledgeListSelect.filter((id: any) => id !== item.kb_id);
+                  setKnowledgeListSelect(_selectList);
+                } else {
+                  const _selectList = [...knowledgeListSelect];
+                  _selectList.push(item.kb_id);
+                  setKnowledgeListSelect(_selectList);
+                }
+              }}
+            >
+              {item.kb_name}
+            </div>
           </Popover>
         );
       })}

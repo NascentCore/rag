@@ -1,6 +1,6 @@
 import { GithubOutlined } from '@ant-design/icons';
 import { DefaultFooter } from '@ant-design/pro-components';
-import { Button, Flex, Input } from 'antd';
+import { Button, Flex, Input, message } from 'antd';
 import React, { useState } from 'react';
 import styles from './index.less';
 import { useModel } from '@umijs/max';
@@ -9,11 +9,16 @@ import { cahtAction, generateUUID, getChatResponseJsonFromResponseText } from '@
 import sendIcon from './assets/send.svg';
 
 const Index: React.FC = () => {
-  const { chatStore, addChatMsg, updateChatMsg, setChatItemState } = useModel('chat');
+  const { chatStore, addChatMsg, updateChatMsg, setChatItemState, knowledgeListSelect } =
+    useModel('chat');
 
   const [userMsgValue, setUserMsgValue] = useState('');
 
   const sendMsg = async () => {
+    if (knowledgeListSelect.length === 0) {
+      message.warning('请至少选择一个知识库');
+      return;
+    }
     if (chatState === 'loading' || userMsgValue.trim() === '') {
       return;
     }
@@ -36,6 +41,7 @@ const Index: React.FC = () => {
     addChatMsg('demo', chatMsgItem);
     cahtAction({
       id: msgId,
+      knowledgeListSelect,
       question: userMsgValue,
       onMessage: (chatMsgItem: IChatItemMsg) => {
         updateChatMsg('demo', chatMsgItem);

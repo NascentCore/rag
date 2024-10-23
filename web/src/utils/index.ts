@@ -46,12 +46,14 @@ export const getChatResponseJsonFromResponseText = (responseText: string) => {
 
 export const cahtAction = async ({
   id,
+  knowledgeListSelect,
   question,
   onMessage,
   onSuccess,
 }: {
   id: string; // msgid
   question: string;
+  knowledgeListSelect: string[];
   onMessage: (chatMsgItem: IChatItemMsg) => void;
   onSuccess: (chatMsgItem: IChatItemMsg) => void;
 }) => {
@@ -66,7 +68,7 @@ export const cahtAction = async ({
       },
       body: JSON.stringify({
         user_id: 'zzp',
-        kb_ids: ['KBb42ee9c8236349d49c8329dbdece3329_240625'],
+        kb_ids: knowledgeListSelect,
         history: [],
         question: question,
         streaming: true,
