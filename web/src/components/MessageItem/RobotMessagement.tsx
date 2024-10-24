@@ -1,6 +1,6 @@
-import { GithubOutlined, UserOutlined } from '@ant-design/icons';
+import { GithubOutlined, RedoOutlined, UserOutlined } from '@ant-design/icons';
 import { DefaultFooter } from '@ant-design/pro-components';
-import { Avatar, Col, Collapse, Flex, Row, Space } from 'antd';
+import { Avatar, Button, Col, Collapse, Flex, Row, Space } from 'antd';
 import React from 'react';
 import styles from './index.less';
 import { IChatItemMsg } from '@/models/chat';
@@ -46,6 +46,16 @@ const Index: React.FC<IProps> = ({ messageItem }) => {
             )}
           </div>
         </Flex>
+        <Button
+          style={{ marginLeft: 40 }}
+          type="link"
+          icon={<RedoOutlined />}
+          onClick={() => {
+            console.log('重新生成');
+          }}
+        >
+          重新生成
+        </Button>
       </div>
     </>
   );

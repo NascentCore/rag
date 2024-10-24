@@ -1,16 +1,27 @@
-import { GithubOutlined } from '@ant-design/icons';
+import {
+  DeleteOutlined,
+  ExclamationCircleFilled,
+  GithubOutlined,
+  SendOutlined,
+} from '@ant-design/icons';
 import { DefaultFooter } from '@ant-design/pro-components';
-import { Button, Flex, Input, message } from 'antd';
+import { Button, Flex, Input, message, Modal } from 'antd';
 import React, { useState } from 'react';
 import styles from './index.less';
 import { useModel } from '@umijs/max';
 import { IChatItemMsg } from '@/models/chat';
 import { cahtAction, generateUUID, getChatResponseJsonFromResponseText } from '@/utils';
 import sendIcon from './assets/send.svg';
-
+const { confirm } = Modal;
 const Index: React.FC = () => {
-  const { chatStore, addChatMsg, updateChatMsg, setChatItemState, knowledgeListSelect } =
-    useModel('chat');
+  const {
+    chatStore,
+    addChatMsg,
+    updateChatMsg,
+    setChatItemState,
+    knowledgeListSelect,
+    deleteChatStore,
+  } = useModel('chat');
 
   const [userMsgValue, setUserMsgValue] = useState('');
 
@@ -54,6 +65,17 @@ const Index: React.FC = () => {
   };
 
   const chatState = chatStore.demo.state;
+
+  const showConfirm = () => {
+    confirm({
+      title: '清空会话?',
+      icon: <ExclamationCircleFilled />,
+      onOk() {
+        deleteChatStore('demo');
+      },
+      onCancel() {},
+    });
+  };
   return (
     <>
       <div className={styles.MessageInputInner}>
@@ -66,9 +88,21 @@ const Index: React.FC = () => {
           }}
         ></Input.TextArea>
         <div className={styles.buttonGroup}>
-          <Button type={'primary'} onClick={sendMsg} shape="round" style={{ padding: '0 12px' }}>
-            <img style={{ width: 18, height: 18 }} src={sendIcon} />
-          </Button>
+          <Button
+            type={'text'}
+            onClick={showConfirm}
+            shape="round"
+            style={{ padding: '0 12px' }}
+            icon={<DeleteOutlined />}
+          ></Button>
+          <Button
+            type={'primary'}
+            className={styles.sendButton}
+            onClick={sendMsg}
+            shape="round"
+            style={{ padding: '0 12px' }}
+            icon={<SendOutlined />}
+          ></Button>
         </div>
       </div>
     </>

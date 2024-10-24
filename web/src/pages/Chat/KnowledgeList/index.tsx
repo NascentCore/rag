@@ -18,16 +18,23 @@ import { api_list_knowledge_base } from '@/services';
 const Admin: React.FC = () => {
   const intl = useIntl();
 
-  const { knowledgeList, setKnowledgeList, knowledgeListSelect, setKnowledgeListSelect } =
-    useModel('chat');
+  const {
+    knowledgeList,
+    setKnowledgeList,
+    knowledgeListSelect,
+    setKnowledgeListSelect,
+    setKnowledgeActiveId,
+  } = useModel('chat');
+
   return (
     <div className={styles.knowledgeList}>
       <Space.Compact style={{ width: '100%', marginBottom: 30 }}>
         <Input
-          defaultValue="请输入知识库名称"
-          style={{ height: 46, backgroundColor: 'transparent', color: '#fff' }}
+          className={styles.addInput}
+          placeholder="请输入知识库名称"
+          style={{ height: 42, backgroundColor: 'transparent', color: '#fff' }}
         />
-        <Button type="primary" style={{ height: 46 }}>
+        <Button type="primary" style={{ height: 42 }}>
           新建
         </Button>
       </Space.Compact>
@@ -41,7 +48,14 @@ const Admin: React.FC = () => {
             content={
               <>
                 <Flex vertical={true} gap={5}>
-                  <Button type="primary" icon={<SettingOutlined />} size={'small'}>
+                  <Button
+                    type="primary"
+                    icon={<SettingOutlined />}
+                    size={'small'}
+                    onClick={() => {
+                      setKnowledgeActiveId(item.kb_id);
+                    }}
+                  >
                     管理
                   </Button>
                   <Button type="primary" icon={<EditOutlined />} size={'small'}>

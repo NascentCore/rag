@@ -7,6 +7,7 @@ import {
   EllipsisOutlined,
   MailOutlined,
   MenuUnfoldOutlined,
+  ReadOutlined,
   TeamOutlined,
 } from '@ant-design/icons';
 import KnowledgeList from '@/pages/Chat/KnowledgeList';
@@ -31,8 +32,20 @@ const Index: React.FC = () => {
           }
           type={'link'}
         ></Button>
+        <Button
+          className={styles.title}
+          onClick={() => {}}
+          size={'large'}
+          icon={
+            <>
+              <ReadOutlined />
+            </>
+          }
+          type={'link'}
+        >
+          知识库
+        </Button>
 
-        <div className={styles.title}>知识库</div>
         <Button
           className={styles.consultationButton}
           onClick={() => {}}

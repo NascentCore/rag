@@ -16,7 +16,7 @@ import { api_list_knowledge_base } from '@/services';
 const Admin: React.FC = () => {
   const intl = useIntl();
 
-  const { setKnowledgeList } = useModel('chat');
+  const { setKnowledgeList ,knowledgeActiveId} = useModel('chat'); 
 
   useEffect(() => {
     api_list_knowledge_base().then((res: any) => {
@@ -27,25 +27,37 @@ const Admin: React.FC = () => {
 
   return (
     <>
-      <ConfigProvider>
+      <ConfigProvider
+        theme={{
+          token: {
+            colorPrimary: '#5a47e5',
+            colorLink: '#5a47e5',
+          },
+        }}
+      >
         <AppHeader />
         <Flex>
           <div className={styles.KnowledgeListWrap}>
             <KnowledgeList />
           </div>
           {/* chat页面 */}
-          <div className={styles.chatPageWrap} style={{ flex: 1 }}>
-            <div className={classNames(styles.chatContainerWrap, 'chat-container')}>
-              <ChatContainer />
+          {!knowledgeActiveId && (
+            <div className={styles.chatPageWrap} style={{ flex: 1 }}>
+              <div className={classNames(styles.chatContainerWrap, 'chat-container')}>
+                <ChatContainer />
+              </div>
+              <div className={styles.MessageInputWrap}>
+                <MessageInput />
+              </div>
             </div>
-            <div className={styles.MessageInputWrap}>
-              <MessageInput />
-            </div>
-          </div>
+          )}
+
           {/* 管理页面 */}
-          {/* <div className={styles.ManagementWrap}>
-            <Management />
-          </div> */}
+          {knowledgeActiveId && (
+            <div className={styles.ManagementWrap}>
+              <Management />
+            </div>
+          )}
         </Flex>
       </ConfigProvider>
     </>

@@ -78,7 +78,7 @@ export default defineConfig({
    */
   title: '国研科技',
   layout: {
-    locale: true,
+    locale: false,
     ...defaultSettings,
   },
   /**
