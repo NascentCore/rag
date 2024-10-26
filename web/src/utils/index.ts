@@ -124,3 +124,47 @@ export const cahtAction = async ({
   const chatMsgItem2: IChatItemMsg = getChatResponseJsonFromResponseText(fullChunk);
   onSuccess({ ...chatMsgItem2, id: id });
 };
+
+export function formatFileSize(bytes: number): string {
+  if (bytes < 1024) {
+    // 对于小于1KB的文件大小，直接返回字节
+    return `${bytes} B`;
+  } else if (bytes < 1024 * 1024) {
+    // 对于小于1MB的文件大小，转换为KB
+    const kilobytes = bytes / 1024;
+    return `${kilobytes.toFixed(2)} KB`;
+  } else if (bytes < 1024 * 1024 * 1024) {
+    // 对于小于1GB的文件大小，转换为MB
+    const megabytes = bytes / (1024 * 1024);
+    return `${megabytes.toFixed(2)} MB`;
+  } else {
+    // 对于大于等于1GB的文件大小，转换为GB
+    const gigabytes = bytes / (1024 * 1024 * 1024);
+    return `${gigabytes.toFixed(2)} GB`;
+  }
+}
+
+export function formatTimestamp(timestamp: string): string {
+  if (timestamp.length !== 12) {
+    throw new Error('Invalid timestamp length. Expected length is 12.');
+  }
+  // 提取年、月、日、小时和分钟
+  const year = timestamp.substring(0, 4);
+  const month = timestamp.substring(4, 6);
+  const day = timestamp.substring(6, 8);
+  const hour = timestamp.substring(8, 10);
+  const minute = timestamp.substring(10, 12);
+
+  // 返回格式化的时间字符串
+  return `${year}-${month}-${day} ${hour}:${minute}`;
+}
+
+export function detectDeviceType() {
+  const isMobile = window.innerWidth <= 768; // 768px通常被认为是移动设备和PC的分界线
+  if (isMobile) {
+    return 'mobile';
+  } else {
+    return 'pc';
+  }
+}
+console.log('detectDeviceType', detectDeviceType());

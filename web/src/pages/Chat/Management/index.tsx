@@ -1,7 +1,7 @@
 import { api_list_files } from '@/services';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import { history, useIntl, useModel } from '@umijs/max';
-import { Button, Result, Segmented, Space, Table } from 'antd';
+import { Button, Flex, Result, Segmented, Space, Table } from 'antd';
 import { Col, Row } from 'antd/es';
 import React, { useEffect, useState } from 'react';
 import DocTable from './DocTable';
@@ -15,23 +15,24 @@ const Index: React.FC = () => {
 
   return (
     <>
-      <Row align={'middle'} gutter={20}>
-        <Col style={{ marginBottom: 10 }}>
-          <Button
-            type={'primary'}
-            icon={<ArrowLeftOutlined />}
-            onClick={() => {
-              setKnowledgeActiveId(void 0);
-            }}
-          >
-            返回对话
-          </Button>
-        </Col>
-        <Col style={{ marginBottom: 10 }}>
-          <div style={{ fontSize: 20 }}>知识库名称: {currentKnowledge?.kb_name}</div>
-        </Col>
-        <Col style={{ marginBottom: 10 }}>知识库id: {currentKnowledge?.kb_id}</Col>
-      </Row>
+      <Flex
+        align={'flex-end'}
+        gap={20}
+        style={{ marginBottom: 10, overflow: 'hidden' }}
+        wrap={'wrap'}
+      >
+        <Button
+          type={'primary'}
+          icon={<ArrowLeftOutlined />}
+          onClick={() => {
+            setKnowledgeActiveId(void 0);
+          }}
+        >
+          返回对话
+        </Button>
+        <div style={{ fontSize: 20 }}>知识库名称: {currentKnowledge?.kb_name}</div>
+        <div style={{ whiteSpace: 'normal' }}>知识库id: {currentKnowledge?.kb_id}</div>
+      </Flex>
       {selectTab === '1' && (
         <DocTable
           knowledgeActiveId={knowledgeActiveId}

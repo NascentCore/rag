@@ -12,18 +12,13 @@ import KnowledgeList from './KnowledgeList';
 import AppHeader from '@/components/AppHeader';
 import Management from './Management';
 import { api_list_knowledge_base } from '@/services';
+import { detectDeviceType } from '@/utils';
+const deviceType = detectDeviceType();
 
 const Admin: React.FC = () => {
   const intl = useIntl();
 
-  const { setKnowledgeList ,knowledgeActiveId} = useModel('chat'); 
-
-  useEffect(() => {
-    api_list_knowledge_base().then((res: any) => {
-      console.log('api_list_knowledge_base', res);
-      setKnowledgeList(res?.data || []);
-    });
-  }, []);
+  const { knowledgeActiveId } = useModel('chat');
 
   return (
     <>
@@ -37,9 +32,11 @@ const Admin: React.FC = () => {
       >
         <AppHeader />
         <Flex>
-          <div className={styles.KnowledgeListWrap}>
-            <KnowledgeList />
-          </div>
+          {deviceType === 'pc' && (
+            <div className={styles.KnowledgeListWrap}>
+              <KnowledgeList />
+            </div>
+          )}
           {/* chat页面 */}
           {!knowledgeActiveId && (
             <div className={styles.chatPageWrap} style={{ flex: 1 }}>

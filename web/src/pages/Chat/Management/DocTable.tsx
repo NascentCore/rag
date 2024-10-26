@@ -1,26 +1,43 @@
-import { api_list_files } from '@/services';
-import { ArrowLeftOutlined } from '@ant-design/icons';
+import { api_delete_files, api_list_files, use_api_list_files } from '@/services';
+import {
+  ArrowLeftOutlined,
+  CheckCircleOutlined,
+  CloseCircleOutlined,
+  HourglassOutlined,
+} from '@ant-design/icons';
 import { history, useIntl, useModel } from '@umijs/max';
-import { Button, Flex, Result, Segmented, Space, Table } from 'antd';
+import { Button, Flex, Popconfirm, Result, Segmented, Space, Table } from 'antd';
 import { Col, Row } from 'antd/es';
 import React, { useEffect, useState } from 'react';
+import UploadFileButton from './UploadFileButton';
+import AddUrlButton from './AddUrlButton';
+import { formatFileSize, formatTimestamp } from '@/utils';
+import { detectDeviceType } from '@/utils';
 
-const Index = ({ knowledgeActiveId, selectTab, setSelectTab }) => {
-  const [dataSource, setDataSource] = useState([]);
-  useEffect(() => {
-    api_list_files({
-      user_id: 'zzp',
-      kb_id: knowledgeActiveId,
-      page_id: 1,
-      page_limit: 10,
-    }).then((res) => {
-      console.log('api_list_files', res.data);
-      setDataSource(res?.data?.details || []);
-    });
-  }, [knowledgeActiveId]);
+const deviceType = detectDeviceType();
+
+const Index = ({ knowledgeActiveId, selectTab, setSelectTab }: any) => {
+  const [current, setCurrent] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+
+  const handleTableChange = (pagination: any) => {
+    setCurrent(pagination.current);
+    setPageSize(pagination.pageSize);
+  };
+  const {
+    data: tableDataSourse,
+    isLoading,
+    mutate: mutateTableDataSourse,
+  } = use_api_list_files({
+    user_id: 'zzp',
+    kb_id: knowledgeActiveId,
+    page_id: current,
+    page_limit: pageSize,
+  });
+
   return (
     <>
-      <Row style={{ marginBottom: 10 }}>
+      <Flex gap={10} wrap={'wrap'} style={{ marginBottom: 10 }}>
         <Segmented<string>
           value={selectTab}
           onChange={setSelectTab}
@@ -32,15 +49,11 @@ const Index = ({ knowledgeActiveId, selectTab, setSelectTab }) => {
         <Button type="default" danger style={{ marginLeft: 'auto' }}>
           取消所有文件上传
         </Button>
-        <Button type="primary" style={{ marginLeft: 10 }}>
-          上传文档
-        </Button>
-        <Button type="default" style={{ marginLeft: 10 }}>
-          添加网址
-        </Button>
-      </Row>
+        <UploadFileButton kb_id={knowledgeActiveId} mutateTableDataSourse={mutateTableDataSourse} />
+        <AddUrlButton kb_id={knowledgeActiveId} mutateTableDataSourse={mutateTableDataSourse} />
+      </Flex>
       <Table
-        scroll={{ x: 'auto', y: 'calc(100vh - 350px)' }}
+        scroll={{ x: '1200px', y: deviceType === 'pc' ? 'calc(100vh - 320px)' : 'auto' }}
         columns={[
           {
             title: '文档ID',
@@ -48,6 +61,9 @@ const Index = ({ knowledgeActiveId, selectTab, setSelectTab }) => {
             key: 'file_id',
             align: 'center',
             width: 120,
+            render: (_) => {
+              return <div style={{ whiteSpace: 'normal' }}> {_}</div>;
+            },
           },
           {
             title: '文档名称',
@@ -55,6 +71,9 @@ const Index = ({ knowledgeActiveId, selectTab, setSelectTab }) => {
             key: 'file_name',
             align: 'center',
             width: 200,
+            render: (_) => {
+              return <div style={{ whiteSpace: 'normal' }}> {_}</div>;
+            },
           },
           {
             title: '文档状态',
@@ -62,6 +81,36 @@ const Index = ({ knowledgeActiveId, selectTab, setSelectTab }) => {
             key: 'status',
             align: 'center',
             width: 200,
+
+            render: (_) => {
+              if (_ === 'gray') {
+                return (
+                  <span>
+                    <HourglassOutlined style={{ color: 'blue' }} /> 排队中
+                  </span>
+                );
+              } else if (_ === 'yellow') {
+                return (
+                  <span>
+                    <HourglassOutlined style={{ color: 'blue' }} /> 解析中
+                  </span>
+                );
+              } else if (_ === 'green') {
+                return (
+                  <span>
+                    <CheckCircleOutlined style={{ color: 'green' }} /> 解析成功
+                  </span>
+                );
+              } else if (_ === 'red') {
+                return (
+                  <span>
+                    <CloseCircleOutlined style={{ color: 'red' }} /> 解析失败
+                  </span>
+                );
+              } else {
+                return _;
+              }
+            },
           },
           {
             title: '文件大小',
@@ -69,13 +118,14 @@ const Index = ({ knowledgeActiveId, selectTab, setSelectTab }) => {
             key: 'bytes',
             align: 'center',
             width: 120,
+            render: (_) => <>{formatFileSize(_)}</>,
           },
           {
             title: '解析后字符数',
             dataIndex: 'content_length',
             key: 'content_length',
             align: 'center',
-            width: 120,
+            width: 220,
           },
           {
             title: '创建日期',
@@ -83,33 +133,61 @@ const Index = ({ knowledgeActiveId, selectTab, setSelectTab }) => {
             key: 'timestamp',
             align: 'center',
             width: 120,
-            render: (text) => new Date(text).toLocaleString(), // 格式化日期
+            render: (_) => formatTimestamp(_),
           },
           {
             title: '备注',
             dataIndex: 'msg',
             key: 'msg',
             align: 'center',
-            width: 120,
+            width: 220,
+            render: (_) => {
+              return <div style={{ whiteSpace: 'normal' }}> {_}</div>;
+            },
           },
           {
             title: '操作',
             key: 'action',
             align: 'center',
-            width: 120,
+            width: 150,
+            fixed: deviceType === 'pc' && 'right',
             render: (text, record) => (
               <>
                 <Space>
-                  <Button danger type={'link'}>
-                    删除
-                  </Button>
+                  <Popconfirm
+                    title="确认操作"
+                    onConfirm={async () => {
+                      const params = {
+                        user_id: 'zzp',
+                        kb_id: knowledgeActiveId,
+                        file_ids: [record.file_id],
+                      };
+                      await api_delete_files(params);
+                      setCurrent(1);
+                      mutateTableDataSourse();
+                    }}
+                    okText="确认"
+                    cancelText="取消"
+                  >
+                    <Button danger type={'link'}>
+                      删除
+                    </Button>
+                  </Popconfirm>
                   <Button type={'link'}>预览</Button>
                 </Space>
               </>
             ),
           },
         ]}
-        dataSource={dataSource}
+        dataSource={tableDataSourse?.details || []}
+        pagination={{
+          current,
+          pageSize,
+          total: tableDataSourse?.total,
+          showTotal: (total) => `共 ${total} 条`,
+        }}
+        loading={isLoading}
+        onChange={handleTableChange}
       ></Table>
     </>
   );

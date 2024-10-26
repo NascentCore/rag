@@ -29,3 +29,88 @@ export async function api_list_files(params: {
     data: params,
   });
 }
+
+export const use_api_list_files = (params: {
+  kb_id: string;
+  page_id: number;
+  page_limit: number;
+  user_id: string;
+}) =>
+  useSWR(
+    ['http://knowledge.llm.sxwl.ai:30002/api/local_doc_qa/list_files', params],
+    ([, params]) => {
+      return api_list_files(params).then((res) => res.data);
+    },
+  );
+
+// 新增知识库
+export async function api_new_knowledge_base(params: {
+  kb_id?: string;
+  kb_name: string;
+  user_id: string;
+}) {
+  return request('http://knowledge.llm.sxwl.ai:30002/api/local_doc_qa/new_knowledge_base', {
+    method: 'POST',
+    data: params,
+  });
+}
+
+// 删除知识库
+export async function api_delete_knowledge_base(params: { kb_ids: string[]; user_id: string }) {
+  return request('http://knowledge.llm.sxwl.ai:30002/api/local_doc_qa/delete_knowledge_base', {
+    method: 'POST',
+    data: params,
+  });
+}
+
+// 重命名
+export async function api_rename_knowledge_base(params: {
+  kb_id: string;
+  new_kb_name: string;
+  user_id: string;
+}) {
+  return request('http://knowledge.llm.sxwl.ai:30002/api/local_doc_qa/rename_knowledge_base', {
+    method: 'POST',
+    data: params,
+  });
+}
+
+// 添加网址
+export async function api_upload_weblink(params: {
+  chunk_size: number;
+  kb_id: string;
+  mode: string;
+  url: string;
+  user_id: string;
+}) {
+  return request('http://knowledge.llm.sxwl.ai:30002/api/local_doc_qa/upload_weblink', {
+    method: 'POST',
+    data: params,
+  });
+}
+
+// 录入问答 http://knowledge.llm.sxwl.ai:30002/api/local_doc_qa/upload_faqs
+export async function api_upload_faqs(params: {
+  user_id: string;
+  kb_id: string;
+  faqs: { question: string; answer: string; nos_key: null }[];
+  chunk_size: string;
+}) {
+  return request('http://knowledge.llm.sxwl.ai:30002/api/local_doc_qa/upload_faqs', {
+    method: 'POST',
+    data: params,
+  });
+}
+
+// 删除问答
+
+export async function api_delete_files(params: {
+  user_id: string;
+  kb_id: string;
+  file_ids: string[];
+}) {
+  return request('http://knowledge.llm.sxwl.ai:30002/api/local_doc_qa/delete_files', {
+    method: 'POST',
+    data: params,
+  });
+}
