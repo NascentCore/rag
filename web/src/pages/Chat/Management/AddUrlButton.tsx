@@ -1,102 +1,97 @@
-import { DeleteOutlined, HeartTwoTone, PlusOutlined, SmileTwoTone } from '@ant-design/icons';
-import { PageContainer, useIntl } from '@ant-design/pro-components';
-import { Button, Flex, Input, message, Modal, Space, Upload, UploadProps } from 'antd';
+import { DeleteOutlined, PlusOutlined } from '@ant-design/icons';
+import { useIntl } from '@ant-design/pro-components';
+import { Button, Flex, Input, Modal, message } from 'antd';
 import React, { useState } from 'react';
-import { InboxOutlined, FileAddOutlined } from '@ant-design/icons';
 import { api_upload_weblink } from '@/services';
-const { Dragger } = Upload;
-const Index: React.FC<{ kb_id: string; mutateTableDataSourse: any }> = ({
+
+const ADD_URL_LABEL = '添加网址';
+const USER_ID = 'zzp';
+
+const Index: React.FC<{ kb_id: string; mutateTableDataSourse: () => void }> = ({
   kb_id,
   mutateTableDataSourse,
 }) => {
   const intl = useIntl();
   const [open, setOpen] = useState(false);
   const [confirmLoading, setConfirmLoading] = useState(false);
-
   const [urlList, setUrlList] = useState<string[]>([]);
+  const [addUrlValue, setAddUrlValue] = useState('');
+
   const showModal = () => {
     setOpen(true);
   };
 
+  const handleUrlChange = (index: number, value: string) => {
+    setUrlList((prev) => {
+      const updatedList = [...prev];
+      updatedList[index] = value;
+      return updatedList;
+    });
+  };
+
+  const handleDeleteUrl = (index: number) => {
+    setUrlList((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleAddUrl = () => {
+    if (addUrlValue && !urlList.includes(addUrlValue)) {
+      setUrlList((prev) => [...prev, addUrlValue]);
+      setAddUrlValue('');
+    }
+  };
+
   const onHandle = async () => {
     setConfirmLoading(true);
-    for (const url of urlList) {
-      const params = {
-        chunk_size: 800,
-        kb_id,
-        mode: 'strong',
-        url: url,
-        user_id: 'zzp',
-      };
-      await api_upload_weblink(params);
+    try {
+      for (const url of urlList) {
+        await api_upload_weblink({ chunk_size: 800, kb_id, mode: 'strong', url, user_id: USER_ID });
+      }
+      message.success('网址添加成功');
+      mutateTableDataSourse();
+    } catch (error) {
+      message.error('添加网址失败');
+    } finally {
+      setConfirmLoading(false);
+      handleCancel();
     }
-    setConfirmLoading(false);
-    handleCancel();
-    mutateTableDataSourse();
   };
+
   const handleCancel = () => {
-    console.log('Clicked cancel button');
     setOpen(false);
   };
 
-  const [addUrlValue, setAddUrlValue] = useState('');
   return (
     <>
       <Button type="default" style={{ marginLeft: 10 }} onClick={showModal}>
-        添加网址
+        {ADD_URL_LABEL}
       </Button>
       <Modal
-        title="添加网址"
+        title={ADD_URL_LABEL}
         open={open}
         onOk={onHandle}
         confirmLoading={confirmLoading}
         onCancel={handleCancel}
         cancelButtonProps={{ style: { display: 'none' } }}
       >
-        <Flex vertical={true} gap={10} style={{ padding: '20px 0' }}>
+        <Flex vertical gap={10} style={{ padding: '20px 0' }}>
           <Input
             size="small"
             value={addUrlValue}
-            onChange={(v) => {
-              setAddUrlValue(v.target.value);
-            }}
-            suffix={
-              <>
-                <Button
-                  onClick={() => {
-                    if (addUrlValue && !urlList.includes(addUrlValue)) {
-                      setUrlList([...urlList, addUrlValue]);
-                      setAddUrlValue('');
-                    }
-                  }}
-                  type="text"
-                  icon={<PlusOutlined />}
-                ></Button>
-              </>
-            }
+            onChange={(e) => setAddUrlValue(e.target.value)}
+            suffix={<Button onClick={handleAddUrl} type="text" icon={<PlusOutlined />} />}
           />
-          {urlList?.map((url, index) => (
+          {urlList.map((url, index) => (
             <Input
               key={url}
               size="small"
               value={url}
-              onChange={(e) => {
-                const _urlList = [...urlList];
-                _urlList[index] = e.target.value;
-                setUrlList(_urlList);
-              }}
+              onChange={(e) => handleUrlChange(index, e.target.value)}
               suffix={
-                <>
-                  <Button
-                    type="text"
-                    icon={<DeleteOutlined />}
-                    onClick={() => {
-                      const _urlList = [...urlList];
-                      _urlList.splice(index, 1);
-                      setUrlList(_urlList);
-                    }}
-                  ></Button>
-                </>
+                <Button
+                  type="text"
+                  icon={<DeleteOutlined />}
+                  onClick={() => handleDeleteUrl(index)}
+                />
               }
             />
           ))}

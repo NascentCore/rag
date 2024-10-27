@@ -1,14 +1,7 @@
-import { api_delete_files, api_list_files, use_api_list_files } from '@/services';
-import {
-  ArrowLeftOutlined,
-  CheckCircleOutlined,
-  CloseCircleOutlined,
-  HourglassOutlined,
-} from '@ant-design/icons';
-import { history, useIntl, useModel } from '@umijs/max';
-import { Button, Flex, Popconfirm, Result, Segmented, Space, Table } from 'antd';
-import { Col, Row } from 'antd/es';
-import React, { useEffect, useState } from 'react';
+import { api_delete_files, use_api_list_files } from '@/services';
+import { CheckCircleOutlined, CloseCircleOutlined, HourglassOutlined } from '@ant-design/icons';
+import { Button, Flex, Popconfirm, Segmented, Space, Table } from 'antd';
+import React, { useState } from 'react';
 import UploadFileButton from './UploadFileButton';
 import AddUrlButton from './AddUrlButton';
 import { formatFileSize, formatTimestamp } from '@/utils';

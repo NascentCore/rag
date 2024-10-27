@@ -167,4 +167,3 @@ export function detectDeviceType() {
     return 'pc';
   }
 }
-console.log('detectDeviceType', detectDeviceType());

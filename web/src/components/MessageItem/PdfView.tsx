@@ -5,7 +5,7 @@ const pdfjsLib = require('pdfjs-dist');
 console.log('pdfjsLib', pdfjsLib);
 
 interface IProps {
-  fileBase64: string;
+  fileBase64?: string;
 }
 
 const Index: React.FC<IProps> = ({ fileBase64 }) => {

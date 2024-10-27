@@ -1,17 +1,10 @@
-import {
-  DeleteOutlined,
-  ExclamationCircleFilled,
-  GithubOutlined,
-  SendOutlined,
-} from '@ant-design/icons';
-import { DefaultFooter } from '@ant-design/pro-components';
-import { Button, Flex, Input, message, Modal } from 'antd';
+import { DeleteOutlined, ExclamationCircleFilled, SendOutlined } from '@ant-design/icons';
+import { Button, Input, message, Modal } from 'antd';
 import React, { useState } from 'react';
 import styles from './index.less';
 import { useModel } from '@umijs/max';
 import { IChatItemMsg } from '@/models/chat';
-import { cahtAction, generateUUID, getChatResponseJsonFromResponseText } from '@/utils';
-import sendIcon from './assets/send.svg';
+import { cahtAction, generateUUID } from '@/utils';
 const { confirm } = Modal;
 const Index: React.FC = () => {
   const {

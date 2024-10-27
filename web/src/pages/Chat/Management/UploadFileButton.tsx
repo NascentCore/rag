@@ -1,5 +1,3 @@
-import { HeartTwoTone, SmileTwoTone } from '@ant-design/icons';
-import { PageContainer, useIntl } from '@ant-design/pro-components';
 import { Button, message, Modal, Upload, UploadProps } from 'antd';
 import React, { useState } from 'react';
 import { InboxOutlined } from '@ant-design/icons';
@@ -8,10 +6,8 @@ const Index: React.FC<{ kb_id: string; mutateTableDataSourse: any }> = ({
   kb_id,
   mutateTableDataSourse,
 }) => {
-  const intl = useIntl();
   const [open, setOpen] = useState(false);
   const [confirmLoading, setConfirmLoading] = useState(false);
-  const [modalText, setModalText] = useState('Content of the modal');
   const props: UploadProps = {
     name: 'files',
     multiple: true,

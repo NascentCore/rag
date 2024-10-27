@@ -1,8 +1,6 @@
-import { HeartTwoTone, SmileTwoTone } from '@ant-design/icons';
-import { PageContainer } from '@ant-design/pro-components';
 import { useIntl } from '@umijs/max';
-import { Alert, Card, ConfigProvider, Flex, Typography } from 'antd';
-import React, { useEffect } from 'react';
+import { ConfigProvider, Flex } from 'antd';
+import React from 'react';
 import ChatContainer from './ChatContainer';
 import MessageInput from '@/components/MessageInput';
 import { useModel } from '@umijs/max';
@@ -11,7 +9,6 @@ import classNames from 'classnames';
 import KnowledgeList from './KnowledgeList';
 import AppHeader from '@/components/AppHeader';
 import Management from './Management';
-import { api_list_knowledge_base } from '@/services';
 import { detectDeviceType } from '@/utils';
 const deviceType = detectDeviceType();
 
@@ -37,8 +34,14 @@ const Admin: React.FC = () => {
               <KnowledgeList />
             </div>
           )}
-          {/* chat页面 */}
-          {!knowledgeActiveId && (
+
+          {knowledgeActiveId ? (
+            /* 管理页面 */
+            <div className={styles.ManagementWrap}>
+              <Management />
+            </div>
+          ) : (
+            /* chat页面 */
             <div className={styles.chatPageWrap} style={{ flex: 1 }}>
               <div className={classNames(styles.chatContainerWrap, 'chat-container')}>
                 <ChatContainer />
@@ -46,13 +49,6 @@ const Admin: React.FC = () => {
               <div className={styles.MessageInputWrap}>
                 <MessageInput />
               </div>
-            </div>
-          )}
-
-          {/* 管理页面 */}
-          {knowledgeActiveId && (
-            <div className={styles.ManagementWrap}>
-              <Management />
             </div>
           )}
         </Flex>
