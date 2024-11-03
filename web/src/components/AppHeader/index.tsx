@@ -1,5 +1,6 @@
-import { Button, Drawer, Dropdown, Flex } from 'antd';
-import React, { useState, useCallback } from 'react';
+import { history, useIntl } from '@umijs/max';
+import { Button, Drawer, Dropdown, Flex, MenuProps, Result } from 'antd';
+import React, { useState } from 'react';
 import styles from './index.less';
 import {
   AreaChartOutlined,
@@ -7,21 +8,14 @@ import {
   MailOutlined,
   MenuUnfoldOutlined,
   ReadOutlined,
+  TeamOutlined,
 } from '@ant-design/icons';
 import KnowledgeList from '@/pages/Chat/KnowledgeList';
 import { detectDeviceType } from '@/utils';
 
 const deviceType = detectDeviceType();
-
-const CommonButton = ({ icon: Icon, text, onClick }) => (
-  <Button onClick={onClick} size={'large'} icon={<Icon />} type={'link'} style={{ color: '#fff' }}>
-    {text}
-  </Button>
-);
-
 const Index: React.FC = () => {
   const [open, setOpen] = useState(false);
-  const handleCloseDrawer = useCallback(() => setOpen(false), [setOpen]);
 
   return (
     <>
@@ -32,7 +26,9 @@ const Index: React.FC = () => {
           <>
             <Button
               className={styles.menuButton}
-              onClick={() => setOpen(true)}
+              onClick={() => {
+                setOpen(true);
+              }}
               size={'large'}
               icon={<MenuUnfoldOutlined />}
               type={'link'}
@@ -41,7 +37,9 @@ const Index: React.FC = () => {
               title={null}
               placement={'left'}
               width={280}
-              onClose={handleCloseDrawer}
+              onClose={() => {
+                setOpen(false);
+              }}
               open={open}
               closeIcon={false}
               bodyStyle={{ padding: 0 }}
@@ -53,27 +51,80 @@ const Index: React.FC = () => {
             </Drawer>
           </>
         )}
-        <CommonButton icon={ReadOutlined} text="知识库" onClick={() => {}} />
+        <Button
+          className={styles.title}
+          onClick={() => {}}
+          size={'large'}
+          icon={<ReadOutlined />}
+          type={'link'}
+        >
+          知识库
+        </Button>
 
         {deviceType === 'pc' && (
-          <>
-            <CommonButton icon={MailOutlined} text="合作咨询" onClick={() => {}} />
-            <CommonButton icon={AreaChartOutlined} text="数据统计" onClick={() => {}} />
-          </>
+          <Button
+            className={styles.consultationButton}
+            onClick={() => {}}
+            size={'large'}
+            icon={<MailOutlined />}
+            type={'link'}
+          >
+            合作咨询
+          </Button>
+        )}
+        {deviceType === 'pc' && (
+          <Button
+            className={styles.statisticsButton}
+            onClick={() => {}}
+            size={'large'}
+            icon={<AreaChartOutlined />}
+            type={'link'}
+          >
+            数据统计
+          </Button>
         )}
         {deviceType === 'mobile' && (
           <Dropdown
             className={styles.dropdownButton}
             placement="bottomRight"
             overlayStyle={{ backgroundColor: '#26293b', borderRadius: 4 }}
-            dropdownRender={() => (
-              <Flex vertical={true} gap={5} style={{ marginTop: 10 }}>
-                <CommonButton icon={MailOutlined} text="合作咨询" onClick={() => {}} />
-                <CommonButton icon={AreaChartOutlined} text="数据统计" onClick={() => {}} />
-              </Flex>
-            )}
+            dropdownRender={() => {
+              return (
+                <>
+                  <Flex vertical={true} gap={5} style={{ marginTop: 10 }}>
+                    <Button
+                      onClick={() => {}}
+                      style={{ color: '#fff' }}
+                      size={'large'}
+                      icon={<MailOutlined />}
+                      type={'link'}
+                    >
+                      合作咨询
+                    </Button>
+                    <Button
+                      onClick={() => {}}
+                      style={{ color: '#fff' }}
+                      size={'large'}
+                      icon={<AreaChartOutlined />}
+                      type={'link'}
+                    >
+                      数据统计
+                    </Button>
+                  </Flex>
+                </>
+              );
+            }}
           >
-            <Button size={'large'} type={'link'} icon={<EllipsisOutlined />}></Button>
+            <Button
+              style={{ color: '#fff' }}
+              size={'large'}
+              type={'link'}
+              icon={
+                <>
+                  <EllipsisOutlined />
+                </>
+              }
+            ></Button>
           </Dropdown>
         )}
       </div>
