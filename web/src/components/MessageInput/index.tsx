@@ -5,6 +5,7 @@ import styles from './index.less';
 import { useModel } from '@umijs/max';
 import { IChatItemMsg } from '@/models/chat';
 import { cahtAction, generateUUID } from '@/utils';
+import SettingButton from './../SettingButton';
 const { confirm } = Modal;
 const Index: React.FC = () => {
   const {
@@ -88,6 +89,7 @@ const Index: React.FC = () => {
             style={{ padding: '0 12px' }}
             icon={<DeleteOutlined />}
           ></Button>
+          <SettingButton />
           <Button
             type={'primary'}
             className={styles.sendButton}
