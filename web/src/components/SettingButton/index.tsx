@@ -2,40 +2,28 @@ import { SettingOutlined } from '@ant-design/icons';
 import {
   Button,
   Checkbox,
-  Col,
-  Flex,
   Form,
   Input,
   message,
   Modal,
-  Row,
   Select,
-  Slider,
   Tooltip,
   Typography,
 } from 'antd';
 import React, { useEffect, useState } from 'react';
 import SliderValueInput from './SliderValueInput';
-import {
-  activeChatSettingConfigured,
-  getUserChatSetting,
-  saveChatSettingConfigured,
-} from '@/utils/userChatSetting';
+import { getChatSettingConfigured, saveChatSettingConfigured } from '@/utils/chatSettingConfigured';
+
 
 const Index: React.FC = () => {
-  const [modelTypeOption, setModelTypeOption] = useState();
+  const [modelTypeOption, setModelTypeOption] = useState<any>();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const [form] = Form.useForm();
 
-  useEffect(() => {
-    changeSelectModel('openAI');
-  }, []);
-
-  const changeSelectModel = (modelType: string) => {
-    const userChatSetting = getUserChatSetting();
-    const chatSettingConfiguredList = userChatSetting.chatSettingConfigured;
+  const changeSelectModel = (modelType?: string) => {
+    const chatSettingConfiguredList = getChatSettingConfigured();
     const modelOptions = chatSettingConfiguredList.map((x: any) => ({
       ...x,
       label: x.modelType,
@@ -43,7 +31,7 @@ const Index: React.FC = () => {
     }));
     console.log('modelOptions', modelOptions);
     setModelTypeOption(modelOptions);
-    const current = modelOptions.find((x) => x.modelType === modelType);
+    const current = modelType ? modelOptions.find((x) => x.modelType === modelType) : modelOptions.find((x) => x.active === true);
     console.log('current', current);
     form.resetFields();
     form.setFieldsValue(current);
@@ -55,8 +43,9 @@ const Index: React.FC = () => {
   const handleOk = () => {
     setIsModalOpen(false);
     form.validateFields().then((values) => {
+      values.active = true;
       console.log('values', values);
-      activeChatSettingConfigured(values);
+      saveChatSettingConfigured(values);
     });
     message.success('保存成功');
   };
@@ -72,7 +61,7 @@ const Index: React.FC = () => {
   const saveCustomerConfig = () => {
     form.validateFields().then((values) => {
       console.log('values', values);
-      const parmas = { ...values, modelType: values.modelName };
+      const parmas = { ...values, active: false };
       console.log('parmas', parmas);
       saveChatSettingConfigured(parmas);
     });
@@ -80,6 +69,12 @@ const Index: React.FC = () => {
     message.success('保存成功');
   };
 
+
+  useEffect(() => {
+    if (isModalOpen) {
+      changeSelectModel()
+    }
+  }, [isModalOpen]);
   return (
     <>
       <Button
@@ -105,6 +100,7 @@ const Index: React.FC = () => {
             console.log('e', e);
           }}
         >
+          <Form.Item name="id" hidden></Form.Item>
           <Form.Item name="modelType" label={'模型提供方'} rules={[{ required: true }]}>
             <Select
               allowClear

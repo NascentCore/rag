@@ -114,3 +114,16 @@ export async function api_delete_files(params: {
     data: params,
   });
 }
+
+export async function api_get_doc_completed(params: {
+  file_id: string;
+  kb_id: string;
+  page_id: number;
+  page_limit: number;
+  user_id: string;
+}) {
+  return request('http://knowledge.llm.sxwl.ai:30002/api/local_doc_qa/get_doc_completed', {
+    method: 'POST',
+    data: params,
+  });
+}

@@ -1,4 +1,5 @@
 import { IChatItemMsg } from '@/models/chat';
+import { getActiveChatSettingConfigured } from './chatSettingConfigured';
 
 export function generateUUID(): string {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
@@ -57,6 +58,7 @@ export const cahtAction = async ({
   onMessage: (chatMsgItem: IChatItemMsg) => void;
   onSuccess: (chatMsgItem: IChatItemMsg) => void;
 }) => {
+  const condigParams = getActiveChatSettingConfigured();
   const response = await fetch(
     'http://knowledge.llm.sxwl.ai:30002/api/local_doc_qa/local_doc_chat',
     {
@@ -71,21 +73,9 @@ export const cahtAction = async ({
         kb_ids: knowledgeListSelect,
         history: [],
         question: question,
-        streaming: true,
-        networking: false,
         product_source: 'saas',
-        rerank: false,
-        only_need_search_results: false,
-        hybrid_search: true,
-        max_token: 1024,
-        api_base: '',
-        api_key: '',
-        model: '',
-        api_context_length: 8192,
-        chunk_size: 800,
-        top_p: 1,
-        top_k: 30,
-        temperature: 0.5,
+        streaming: true,
+        ...condigParams,
       }),
     },
   );

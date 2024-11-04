@@ -1,11 +1,11 @@
 import { api_delete_files, use_api_list_files } from '@/services';
+import { detectDeviceType, formatFileSize, formatTimestamp } from '@/utils';
 import { CheckCircleOutlined, CloseCircleOutlined, HourglassOutlined } from '@ant-design/icons';
 import { Button, Flex, Popconfirm, Segmented, Space, Table } from 'antd';
-import React, { useState } from 'react';
-import UploadFileButton from './UploadFileButton';
+import { useState } from 'react';
 import AddUrlButton from './AddUrlButton';
-import { formatFileSize, formatTimestamp } from '@/utils';
-import { detectDeviceType } from '@/utils';
+import DocPreviewButton from './DocPreviewButton';
+import UploadFileButton from './UploadFileButton';
 
 const deviceType = detectDeviceType();
 
@@ -166,7 +166,7 @@ const Index = ({ knowledgeActiveId, selectTab, setSelectTab }: any) => {
                       删除
                     </Button>
                   </Popconfirm>
-                  <Button type={'link'}>预览</Button>
+                  <DocPreviewButton record={record} />
                 </Space>
               </>
             ),
