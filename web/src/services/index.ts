@@ -127,3 +127,20 @@ export async function api_get_doc_completed(params: {
     data: params,
   });
 }
+
+export const use_api_get_doc_completed = (params: {
+  show: boolean;
+  file_id: string;
+  kb_id: string;
+  page_id: number;
+  page_limit: number;
+  user_id: string;
+}) =>
+  useSWR(
+    ['http://knowledge.llm.sxwl.ai:30002/api/local_doc_qa/get_doc_completed', params],
+    params.show
+      ? ([, params]) => {
+          return api_get_doc_completed(params);
+        }
+      : null,
+  );

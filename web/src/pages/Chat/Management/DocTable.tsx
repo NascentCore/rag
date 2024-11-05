@@ -144,7 +144,7 @@ const Index = ({ knowledgeActiveId, selectTab, setSelectTab }: any) => {
             align: 'center',
             width: 150,
             fixed: deviceType === 'pc' && 'right',
-            render: (text, record) => (
+            render: (text, record: any) => (
               <>
                 <Space>
                   <Popconfirm
@@ -166,7 +166,7 @@ const Index = ({ knowledgeActiveId, selectTab, setSelectTab }: any) => {
                       删除
                     </Button>
                   </Popconfirm>
-                  <DocPreviewButton record={record} />
+                  <DocPreviewButton record={{ ...record, kb_id: knowledgeActiveId }} />
                 </Space>
               </>
             ),
