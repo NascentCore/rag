@@ -157,3 +157,44 @@ export function detectDeviceType() {
     return 'pc';
   }
 }
+
+// 文件扩展名映射到对应的data URI scheme
+export const FileMimeTypeMap: any = {
+  md: 'text/markdown',
+  txt: 'text/plain',
+  pdf: 'application/pdf',
+  jpg: 'image/jpeg',
+  png: 'image/png',
+  jpeg: 'image/jpeg',
+  docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  pptx: 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+  eml: 'message/rfc822',
+  csv: 'text/csv',
+};
+
+// 获取文件后缀
+export function getFileExtension(filename: string): any {
+  const lastDotIndex = filename.lastIndexOf('.');
+  if (lastDotIndex === -1 || lastDotIndex === 0) {
+    return '';
+  }
+  return filename.substring(lastDotIndex + 1);
+}
+
+export function base64ToBlobUrl(base64Data: string, mimeType: string) {
+  const byteCharacters = atob(base64Data);
+  const byteArrays = [];
+  for (let offset = 0; offset < byteCharacters.length; offset += 512) {
+    const slice = byteCharacters.slice(offset, offset + 512);
+    const byteNumbers = new Array(slice.length);
+    for (let i = 0; i < slice.length; i++) {
+      byteNumbers[i] = slice.charCodeAt(i);
+    }
+    const byteArray = new Uint8Array(byteNumbers);
+    byteArrays.push(byteArray);
+  }
+  const blob = new Blob(byteArrays, { type: mimeType });
+  const blobUrl = URL.createObjectURL(blob);
+  return blobUrl;
+}

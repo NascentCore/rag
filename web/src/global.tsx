@@ -89,18 +89,3 @@ if (pwa) {
 
   clearCache();
 }
-
-// if (typeof window !== 'undefined') {
-//   const script = document.createElement('script');
-//   script.src = '/scripts/pdfjs/pdf.mjs'; 
-//   script.type = 'module';
-//   script.async = true;
-//   document.head.appendChild(script);
-// }
-
-// if (typeof window !== 'undefined') {
-//   const link = document.createElement('link');
-//   link.rel = 'stylesheet';
-//   link.href = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.7.76/pdf_viewer.min.css';
-//   document.head.appendChild(link);
-// }

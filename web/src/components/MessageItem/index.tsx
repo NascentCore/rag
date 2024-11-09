@@ -1,5 +1,5 @@
 import React from 'react';
-import RobotMessagement from './RobotMessagement';
+import RobotMessageItem from './RobotMessageItem';
 import UserMessageItem from './UserMessageItem';
 import { IChatItemMsg } from '@/models/chat';
 
@@ -8,7 +8,7 @@ interface IProps {
 }
 
 const Index: React.FC<IProps> = ({ messageItem }) => {
-  const MessageComponent = messageItem.role === 'user' ? UserMessageItem : RobotMessagement;
+  const MessageComponent = messageItem.role === 'user' ? UserMessageItem : RobotMessageItem;
 
   return <MessageComponent messageItem={messageItem} />;
 };
