@@ -9,10 +9,10 @@ export function generateUUID(): string {
   });
 }
 
-export function scrollChatBodyToBottom() {
-  document.querySelector('.chat-container')?.scrollTo({
+export function scrollChatBodyToBottom(key: string, animate: boolean = true) {
+  document.querySelector(`.messageContainer_${key}`)?.scrollTo({
     top: 9999999999,
-    behavior: 'smooth',
+    behavior: animate ? 'smooth' : void 0,
   });
 }
 

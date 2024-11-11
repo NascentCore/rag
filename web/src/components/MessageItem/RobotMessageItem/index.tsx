@@ -6,12 +6,14 @@ import { IChatItemMsg } from '@/models/chat';
 import SourceDocumentsList from './SourceDocumentsList';
 import assistantAvatar from './../assets/assistant-avatar.png';
 import { MarkdownContent } from './../../MarkdownContent';
+import { useModel } from '@umijs/max';
 
 interface IProps {
   messageItem: IChatItemMsg;
 }
 
 const Index: React.FC<IProps> = ({ messageItem }) => {
+  const { reQuestionAction } = useModel('chat');
   console.log('RobotMessageItem messageItem', messageItem);
   const sourceDocsCount = messageItem.source_documents?.length;
 
@@ -48,7 +50,10 @@ const Index: React.FC<IProps> = ({ messageItem }) => {
         style={{ marginLeft: 40 }}
         type="link"
         icon={<RedoOutlined />}
-        onClick={() => console.log('重新生成')}
+        onClick={() => {
+          console.log('重新生成');
+          reQuestionAction(messageItem);
+        }}
       >
         重新生成
       </Button>

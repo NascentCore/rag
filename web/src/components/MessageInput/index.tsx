@@ -8,15 +8,9 @@ import { cahtAction, generateUUID } from '@/utils';
 import SettingButton from './../SettingButton';
 const { confirm } = Modal;
 const Index: React.FC = () => {
-  const {
-    chatStore,
-    addChatMsg,
-    updateChatMsg,
-    setChatItemState,
-    knowledgeListSelect,
-    deleteChatStore,
-  } = useModel('chat');
-
+  const { chatStore, activeChat, knowledgeListSelect, deleteChatStore, questionAction } =
+    useModel('chat');
+  const chatState = chatStore[activeChat]?.state;
   const [userMsgValue, setUserMsgValue] = useState('');
 
   const sendMsg = async () => {
@@ -27,45 +21,16 @@ const Index: React.FC = () => {
     if (chatState === 'loading' || userMsgValue.trim() === '') {
       return;
     }
-    const chatMsgItemUser: IChatItemMsg = {
-      content: userMsgValue,
-      role: 'user',
-      date: '',
-      id: generateUUID(),
-    };
-    addChatMsg('demo', chatMsgItemUser);
-    setChatItemState('demo', 'loading');
+    questionAction({ chatid: activeChat, userMsgValue });
     setUserMsgValue('');
-    const msgId = generateUUID();
-    const chatMsgItem: IChatItemMsg = {
-      content: '正在搜索...',
-      role: 'assistant',
-      id: msgId,
-      date: '',
-    };
-    addChatMsg('demo', chatMsgItem);
-    cahtAction({
-      id: msgId,
-      knowledgeListSelect,
-      question: userMsgValue,
-      onMessage: (chatMsgItem: IChatItemMsg) => {
-        updateChatMsg('demo', chatMsgItem);
-      },
-      onSuccess: (chatMsgItem: IChatItemMsg) => {
-        updateChatMsg('demo', chatMsgItem);
-        setChatItemState('demo', 'success');
-      },
-    });
   };
-
-  const chatState = chatStore.demo.state;
 
   const showConfirm = () => {
     confirm({
       title: '清空会话?',
       icon: <ExclamationCircleFilled />,
       onOk() {
-        deleteChatStore('demo');
+        deleteChatStore(activeChat);
       },
       onCancel() {},
     });
@@ -79,6 +44,19 @@ const Index: React.FC = () => {
           value={userMsgValue}
           onChange={(e) => {
             setUserMsgValue(e.target.value);
+          }}
+          onPressEnter={(event) => {
+            if (window.innerWidth > 800) {
+              if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendMsg();
+              }
+            } else {
+              if (event.key === 'Enter' && event.ctrlKey) {
+                event.preventDefault();
+                sendMsg();
+              }
+            }
           }}
         ></Input.TextArea>
         <div className={styles.buttonGroup}>
