@@ -1,9 +1,11 @@
-import { useState, useEffect } from 'react';
-import { Col, Modal, Row, Typography } from 'antd';
+import { useState, useEffect, useRef } from 'react';
+import { Button, Col, Flex, Modal, Row, Typography } from 'antd';
 import { api_get_file_base64 } from '@/services';
 import { DownCircleOutlined, UpCircleOutlined } from '@ant-design/icons';
 import { MarkdownContent } from './../../../MarkdownContent';
 import FilePreview from '@/components/FilePreview';
+import { base64ToBlobUrl, FileMimeTypeMap, getFileExtension } from '@/utils';
+import DownloadFileButton from './DownloadFileButton';
 const isMobile = window.screen.width <= 768;
 
 interface IDocumentItem {
@@ -46,7 +48,7 @@ const SourceDocumentsItem: React.FC = ({ item, docLinkClick }: any) => {
 const SourceDocumentsList: React.FC<IProps> = ({ messageItem }) => {
   const [modalDataItem, setModalDataItem] = useState<IDocumentItem>();
   const [isModalOpen, setIsModalOpen] = useState(false);
-
+  const previewRef = useRef(null);
   return (
     <>
       {messageItem?.source_documents?.map((item: IDocumentItem) => (
@@ -61,7 +63,17 @@ const SourceDocumentsList: React.FC<IProps> = ({ messageItem }) => {
         />
       ))}
       <Modal
-        title={modalDataItem?.file_name}
+        title={
+          <>
+            <Flex>
+              <div>{modalDataItem?.file_name}</div>
+              <DownloadFileButton
+                fileId={modalDataItem?.file_id}
+                fileName={modalDataItem?.file_name}
+              />
+            </Flex>
+          </>
+        }
         open={isModalOpen}
         onCancel={() => {
           setIsModalOpen(false);
@@ -76,7 +88,11 @@ const SourceDocumentsList: React.FC<IProps> = ({ messageItem }) => {
       >
         <div style={{ height: '78vh', overflow: 'scroll' }}>
           {isModalOpen && (
-            <FilePreview file_id={modalDataItem.file_id} file_name={modalDataItem.file_name} />
+            <FilePreview
+              ref={previewRef}
+              file_id={modalDataItem.file_id}
+              file_name={modalDataItem.file_name}
+            />
           )}
         </div>
       </Modal>
