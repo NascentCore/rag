@@ -18,7 +18,10 @@ const DownloadButton = ({ fileId, fileName }: any) => {
       const fileExtension = getFileExtension(fileName);
       const mimeType = FileMimeTypeMap[fileExtension];
       const blobUrl = base64ToBlobUrl(base64Data, mimeType);
-      window.open(blobUrl);
+      const link = document.createElement('a');
+      link.href = blobUrl;
+      link.download = fileName;
+      link.click();
     } catch (error) {
       console.error('下载文件时发生错误:', error);
     }

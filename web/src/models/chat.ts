@@ -43,9 +43,7 @@ const testChatStore: IChatStore = {
 export default () => {
   // 管理 知识库 数据
   const [knowledgeList, setKnowledgeList] = useState<IKnowledgeListItem[]>([]);
-  const [knowledgeListSelect, setKnowledgeListSelect] = useState<string[]>([
-    'KBb42ee9c8236349d49c8329dbdece3329_240625',
-  ]);
+  const [knowledgeListSelect, setKnowledgeListSelect] = useState<string[]>([]);
   const [knowledgeActiveId, setKnowledgeActiveId] = useState();
 
   // 管理 chat 数据
@@ -56,12 +54,18 @@ export default () => {
   useEffect(() => {
     const _chatStore = localStorage.getItem('chat_store');
     const _activeChat = localStorage.getItem('chat_store_active');
+    const _knowledgeListSelect = localStorage.getItem('chat_store_knowledge_list_select');
     if (_chatStore) {
-      setChatStore(JSON.parse(_chatStore));
-      setActiveChat(Object.keys(_chatStore)[0]);
+      const _chatStoreJson = JSON.parse(_chatStore);
+      setChatStore(_chatStoreJson);
+      setActiveChat(Object.keys(_chatStoreJson)[0]);
     }
     if (_activeChat) {
       setActiveChat(_activeChat);
+    }
+    if (_knowledgeListSelect) {
+      const _knowledgeListSelectJson = JSON.parse(_knowledgeListSelect);
+      setKnowledgeListSelect(_knowledgeListSelectJson);
     }
   }, []);
 
@@ -72,6 +76,10 @@ export default () => {
   useEffect(() => {
     localStorage.setItem('chat_store_active', activeChat);
   }, [activeChat]);
+
+  useEffect(() => {
+    localStorage.setItem('chat_store_knowledge_list_select', JSON.stringify(knowledgeListSelect));
+  }, [knowledgeListSelect]);
 
   useEffect(() => {
     reloadKnowledgeList();
