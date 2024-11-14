@@ -1,0 +1,35 @@
+.knowledgeList {
+  width: 280px;
+  height: calc(100vh - 56px);
+  background-color: #26293b;
+  padding: 14px 24px;
+
+  .addInput {
+    &::placeholder {
+      color: #fff;
+      opacity: 0.5;
+    }
+    border: 1px solid #373b4d;
+  }
+  .knowledgeListItem {
+    display: flex;
+    align-items: center;
+    height: 42px;
+    margin-bottom: 16px;
+    width: 100%;
+    border-radius: 8px;
+    color: #fff;
+    // border: solid 2px #fff;
+    background-color: #333647;
+    padding: 0 12px;
+
+    &.knowledgeListItem_select {
+      background: linear-gradient(284deg, #7b5ef2 -1%, #c383fe 97%);
+    }
+  }
+}
+@media screen and (max-width: 768px) {
+  .knowledgeList {
+    height: 100vh;
+  }
+}
