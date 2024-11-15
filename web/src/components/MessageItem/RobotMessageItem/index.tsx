@@ -1,12 +1,12 @@
-import { RedoOutlined } from '@ant-design/icons';
-import { Avatar, Button, Collapse, Flex } from 'antd';
-import React from 'react';
-import styles from './../index.less';
 import { IChatItemMsg } from '@/models/chat';
-import SourceDocumentsList from './SourceDocumentsList';
-import assistantAvatar from './../assets/assistant-avatar.png';
-import { MarkdownContent } from './../../MarkdownContent';
+import { RedoOutlined } from '@ant-design/icons';
 import { useModel } from '@umijs/max';
+import { Avatar, Button, Collapse } from 'antd';
+import React from 'react';
+import { MarkdownContent } from './../../MarkdownContent';
+import assistantAvatar from './../assets/assistant-avatar.png';
+import styles from './../index.less';
+import SourceDocumentsList from './SourceDocumentsList';
 
 interface IProps {
   messageItem: IChatItemMsg;
@@ -18,8 +18,8 @@ const Index: React.FC<IProps> = ({ messageItem }) => {
   const sourceDocsCount = messageItem.source_documents?.length;
 
   return (
-    <div className={styles.messageItemWrap}>
-      <Flex gap={8}>
+    <>
+      <div className={styles.messageItemWrap}>
         <div>
           <Avatar
             size="large"
@@ -27,7 +27,6 @@ const Index: React.FC<IProps> = ({ messageItem }) => {
             style={{ background: '#fff' }}
           />
         </div>
-
         <div className={styles.messageItemContent} style={{ background: '#fff' }}>
           <MarkdownContent content={messageItem.content} />
           {sourceDocsCount && sourceDocsCount > 0 && (
@@ -45,7 +44,8 @@ const Index: React.FC<IProps> = ({ messageItem }) => {
             />
           )}
         </div>
-      </Flex>
+      </div>
+
       <Button
         style={{ marginLeft: 40 }}
         type="link"
@@ -57,7 +57,7 @@ const Index: React.FC<IProps> = ({ messageItem }) => {
       >
         重新生成
       </Button>
-    </div>
+    </>
   );
 };
 

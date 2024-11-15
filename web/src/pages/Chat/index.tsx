@@ -1,15 +1,13 @@
-import { useIntl } from '@umijs/max';
+import AppHeader from '@/components/AppHeader';
+import MessageInput from '@/components/MessageInput';
+import { detectDeviceType } from '@/utils';
+import { useIntl, useModel } from '@umijs/max';
 import { ConfigProvider, Flex } from 'antd';
 import React from 'react';
 import ChatContainer from './ChatContainer';
-import MessageInput from '@/components/MessageInput';
-import { useModel } from '@umijs/max';
 import styles from './index.less';
-import classNames from 'classnames';
 import KnowledgeList from './KnowledgeList';
-import AppHeader from '@/components/AppHeader';
 import Management from './Management';
-import { detectDeviceType } from '@/utils';
 const deviceType = detectDeviceType();
 
 const Admin: React.FC = () => {
@@ -30,7 +28,7 @@ const Admin: React.FC = () => {
         <AppHeader />
         <Flex>
           {deviceType === 'pc' && (
-            <div className={styles.KnowledgeListWrap}>
+            <div className={styles.KnowledgeListWrap} id="knowledge-list-wrap">
               <KnowledgeList />
             </div>
           )}
@@ -43,7 +41,7 @@ const Admin: React.FC = () => {
           ) : (
             /* chat页面 */
             <div className={styles.chatPageWrap} style={{ flex: 1 }}>
-              <div className={classNames(styles.chatContainerWrap, 'chat-container')}>
+              <div className={styles.chatContainerWrap} id="chat-container">
                 <ChatContainer />
               </div>
               <div className={styles.MessageInputWrap}>

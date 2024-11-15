@@ -1,12 +1,16 @@
 import { api_list_knowledge_base } from '@/services';
 import { cahtAction, generateUUID, scrollChatBodyToBottom } from '@/utils';
-import { useState, useCallback, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 const updateFlagKey = 'code_update_2024_11_10';
 if (!localStorage.getItem(updateFlagKey)) {
   localStorage.clear();
   localStorage.setItem(updateFlagKey, 'true');
 }
+
+export const chat_store_key = 'Chat_Store';
+export const chat_store_active_key = 'Chat_Store_Active';
+export const chat_store_knowledge_list_select_key = 'Chat_Store_Knowledge_List_Select';
 
 export interface IChatItemMsg {
   content: string;
@@ -49,12 +53,11 @@ export default () => {
   // 管理 chat 数据
   const [chatStore, setChatStore] = useState<IChatStore>(testChatStore);
   const [activeChat, setActiveChat] = useState('demo');
-
   console.log('chatStore', chatStore);
   useEffect(() => {
-    const _chatStore = localStorage.getItem('chat_store');
-    const _activeChat = localStorage.getItem('chat_store_active');
-    const _knowledgeListSelect = localStorage.getItem('chat_store_knowledge_list_select');
+    const _chatStore = localStorage.getItem(chat_store_key);
+    const _activeChat = localStorage.getItem(chat_store_active_key);
+    const _knowledgeListSelect = localStorage.getItem(chat_store_knowledge_list_select_key);
     if (_chatStore) {
       const _chatStoreJson = JSON.parse(_chatStore);
       setChatStore(_chatStoreJson);
@@ -70,15 +73,15 @@ export default () => {
   }, []);
 
   useEffect(() => {
-    localStorage.setItem('chat_store', JSON.stringify(chatStore));
+    localStorage.setItem(chat_store_key, JSON.stringify(chatStore));
   }, [chatStore]);
 
   useEffect(() => {
-    localStorage.setItem('chat_store_active', activeChat);
+    localStorage.setItem(chat_store_active_key, activeChat);
   }, [activeChat]);
 
   useEffect(() => {
-    localStorage.setItem('chat_store_knowledge_list_select', JSON.stringify(knowledgeListSelect));
+    localStorage.setItem(chat_store_knowledge_list_select_key, JSON.stringify(knowledgeListSelect));
   }, [knowledgeListSelect]);
 
   useEffect(() => {

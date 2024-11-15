@@ -2,31 +2,31 @@
   flex: 0 0 280px;
 }
 .chatPageWrap {
+  flex: 1;
   height: calc(100vh - 56px);
   background-color: #f3f6fd;
-  flex: 1;
 
   .chatContainerWrap {
     position: relative;
-    overflow-y: scroll;
-    height: calc(100vh - 206px);
+    height: calc(100vh - 176px);
     padding: 0 15px;
+    overflow-y: scroll;
   }
   .MessageInputWrap {
-    margin-top: 10px;
     position: relative;
     height: 160px;
+    margin-top: 10px;
     padding: 0 15px;
   }
 }
 
 .ManagementWrap {
   position: relative;
-  overflow-y: scroll;
-  height: calc(100vh - 56px);
-  background-color: #f3f6fd;
   flex: 1;
+  height: calc(100vh - 56px);
   padding: 30px;
+  overflow-y: scroll;
+  background-color: #f3f6fd;
 }
 
 @media screen and (max-width: 768px) {
