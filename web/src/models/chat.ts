@@ -1,12 +1,16 @@
 import { api_list_knowledge_base } from '@/services';
 import { cahtAction, generateUUID, scrollChatBodyToBottom } from '@/utils';
-import { useState, useCallback, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 const updateFlagKey = 'code_update_2024_11_10';
 if (!localStorage.getItem(updateFlagKey)) {
   localStorage.clear();
   localStorage.setItem(updateFlagKey, 'true');
 }
+
+export const chat_store_key = 'Chat_Store';
+export const chat_store_active_key = 'Chat_Store_Active';
+export const chat_store_knowledge_list_select_key = 'Chat_Store_Knowledge_List_Select';
 
 export interface IChatItemMsg {
   content: string;
@@ -43,35 +47,42 @@ const testChatStore: IChatStore = {
 export default () => {
   // 管理 知识库 数据
   const [knowledgeList, setKnowledgeList] = useState<IKnowledgeListItem[]>([]);
-  const [knowledgeListSelect, setKnowledgeListSelect] = useState<string[]>([
-    'KBb42ee9c8236349d49c8329dbdece3329_240625',
-  ]);
+  const [knowledgeListSelect, setKnowledgeListSelect] = useState<string[]>([]);
   const [knowledgeActiveId, setKnowledgeActiveId] = useState();
 
   // 管理 chat 数据
   const [chatStore, setChatStore] = useState<IChatStore>(testChatStore);
   const [activeChat, setActiveChat] = useState('demo');
-
   console.log('chatStore', chatStore);
   useEffect(() => {
-    const _chatStore = localStorage.getItem('chat_store');
-    const _activeChat = localStorage.getItem('chat_store_active');
+    const _chatStore = localStorage.getItem(chat_store_key);
+    const _activeChat = localStorage.getItem(chat_store_active_key);
+    const _knowledgeListSelect = localStorage.getItem(chat_store_knowledge_list_select_key);
     if (_chatStore) {
-      setChatStore(JSON.parse(_chatStore));
-      setActiveChat(Object.keys(_chatStore)[0]);
+      const _chatStoreJson = JSON.parse(_chatStore);
+      setChatStore(_chatStoreJson);
+      setActiveChat(Object.keys(_chatStoreJson)[0]);
     }
     if (_activeChat) {
       setActiveChat(_activeChat);
     }
+    if (_knowledgeListSelect) {
+      const _knowledgeListSelectJson = JSON.parse(_knowledgeListSelect);
+      setKnowledgeListSelect(_knowledgeListSelectJson);
+    }
   }, []);
 
   useEffect(() => {
-    localStorage.setItem('chat_store', JSON.stringify(chatStore));
+    localStorage.setItem(chat_store_key, JSON.stringify(chatStore));
   }, [chatStore]);
 
   useEffect(() => {
-    localStorage.setItem('chat_store_active', activeChat);
+    localStorage.setItem(chat_store_active_key, activeChat);
   }, [activeChat]);
+
+  useEffect(() => {
+    localStorage.setItem(chat_store_knowledge_list_select_key, JSON.stringify(knowledgeListSelect));
+  }, [knowledgeListSelect]);
 
   useEffect(() => {
     reloadKnowledgeList();

@@ -1,17 +1,16 @@
-import { history, useIntl } from '@umijs/max';
-import { Button, Drawer, Dropdown, Flex, MenuProps, Result } from 'antd';
-import React, { useState } from 'react';
-import styles from './index.less';
+import KnowledgeList from '@/pages/Chat/KnowledgeList';
+import { detectDeviceType } from '@/utils';
+import { getCommonSettingConfigured } from '@/utils/commonSettingConfigured';
 import {
   AreaChartOutlined,
   EllipsisOutlined,
   MailOutlined,
   MenuUnfoldOutlined,
   ReadOutlined,
-  TeamOutlined,
 } from '@ant-design/icons';
-import KnowledgeList from '@/pages/Chat/KnowledgeList';
-import { detectDeviceType } from '@/utils';
+import { Button, Drawer, Dropdown, Flex } from 'antd';
+import React, { useState } from 'react';
+import styles from './index.less';
 
 const deviceType = detectDeviceType();
 const Index: React.FC = () => {
@@ -20,7 +19,9 @@ const Index: React.FC = () => {
   return (
     <>
       <div className={styles.NavBar}>
-        {deviceType === 'pc' && <div className={styles.logoWrap}>国研科技</div>}
+        {deviceType === 'pc' && (
+          <div className={styles.logoWrap}>{getCommonSettingConfigured()?.webSiteTitle}</div>
+        )}
 
         {deviceType === 'mobile' && (
           <>

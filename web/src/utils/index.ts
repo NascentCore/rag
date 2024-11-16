@@ -198,3 +198,4 @@ export function base64ToBlobUrl(base64Data: string, mimeType: string) {
   const blobUrl = URL.createObjectURL(blob);
   return blobUrl;
 }
+

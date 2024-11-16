@@ -1,10 +1,11 @@
 import MessageItem from '@/components/MessageItem';
-import React from 'react';
-import styles from './index.less';
-import { useModel } from '@umijs/max';
 import { IChatItemMsg } from '@/models/chat';
+import { detectDeviceType } from '@/utils';
+import { useModel } from '@umijs/max';
 import { Button, Tabs } from 'antd';
 import classNames from 'classnames';
+import React from 'react';
+import styles from './index.less';
 
 const Index: React.FC = () => {
   const { chatStore, addChatWindow, deleteChatWindow, changeChatWindow, activeChat } =
@@ -35,26 +36,32 @@ const Index: React.FC = () => {
 
   return (
     <>
-      <Tabs
-        tabBarExtraContent={{
-          left: (
-            <Button type="link" onClick={addChatWindow}>
-              新建对话窗口
-            </Button>
-          ),
+      <div
+        style={{
+          width: detectDeviceType() === 'pc' ? window.innerWidth - 320 : window.innerWidth - 30,
         }}
-        activeKey={activeChat}
-        items={tabList}
-        onChange={changeChatWindow}
-        type="editable-card"
-        onEdit={(targetKey: any, action: 'add' | 'remove') => {
-          console.log('targetKey', targetKey);
-          if (action === 'remove') {
-            deleteChatWindow(targetKey);
-          }
-        }}
-        hideAdd
-      />
+      >
+        <Tabs
+          tabBarExtraContent={{
+            left: (
+              <Button type="link" onClick={addChatWindow}>
+                新建对话窗口
+              </Button>
+            ),
+          }}
+          activeKey={activeChat}
+          items={tabList}
+          onChange={changeChatWindow}
+          type="editable-card"
+          onEdit={(targetKey: any, action: 'add' | 'remove') => {
+            console.log('targetKey', targetKey);
+            if (action === 'remove') {
+              deleteChatWindow(targetKey);
+            }
+          }}
+          hideAdd
+        />
+      </div>
     </>
   );
 };
