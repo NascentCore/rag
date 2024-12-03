@@ -1,5 +1,6 @@
 import { IChatItemMsg } from '@/models/chat';
 import { getActiveChatSettingConfigured } from './chatSettingConfigured';
+import { BaseUrl } from '@/services';
 
 export function generateUUID(): string {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
@@ -11,6 +12,13 @@ export function generateUUID(): string {
 
 export function scrollChatBodyToBottom(key: string, animate: boolean = true) {
   document.querySelector(`.messageContainer_${key}`)?.scrollTo({
+    top: 9999999999,
+    behavior: animate ? 'smooth' : void 0,
+  });
+}
+
+export function scrollH5ChatBodyToBottom(animate: boolean = true) {
+  document.querySelector(`#chat-container-h5`)?.scrollTo({
     top: 9999999999,
     behavior: animate ? 'smooth' : void 0,
   });
@@ -32,11 +40,12 @@ export const getChatResponseJsonFromResponseText = (responseText: string) => {
       }
     }
   }
-  const { response, source_documents } = json;
+  const { response, source_documents, show_images } = json;
   const msgId = generateUUID();
   const chatMsgItem: IChatItemMsg = {
     content: response,
     source_documents,
+    show_images,
     role: 'assistant',
     id: msgId,
     date: '',
@@ -59,26 +68,101 @@ export const cahtAction = async ({
   onSuccess: (chatMsgItem: IChatItemMsg) => void;
 }) => {
   const condigParams = getActiveChatSettingConfigured();
-  const response = await fetch(
-    'http://knowledge.llm.sxwl.ai:30002/api/local_doc_qa/local_doc_chat',
-    {
-      method: 'POST',
-      headers: {
-        Accept: 'text/event-stream,application/json, text/event-stream',
-        'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8,zh-TW;q=0.7,mt;q=0.6,pl;q=0.5',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        user_id: 'zzp',
-        kb_ids: knowledgeListSelect,
-        history: [],
-        question: question,
-        product_source: 'saas',
-        streaming: true,
-        ...condigParams,
-      }),
+  const response = await fetch(`${BaseUrl}/api/local_doc_qa/local_doc_chat`, {
+    method: 'POST',
+    headers: {
+      Accept: 'text/event-stream,application/json, text/event-stream',
+      'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8,zh-TW;q=0.7,mt;q=0.6,pl;q=0.5',
+      'Content-Type': 'application/json',
     },
-  );
+    body: JSON.stringify({
+      user_id: 'zzp',
+      kb_ids: knowledgeListSelect,
+      history: [],
+      question: question,
+      product_source: 'saas',
+      streaming: true,
+      ...condigParams,
+    }),
+  });
+
+  const reader = (response as any).body.getReader();
+  const decoder = new TextDecoder();
+  let fullChunk = '';
+  let fullResponse = '';
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    const chunk = decoder.decode(value);
+    fullChunk += chunk;
+    const lines = chunk.split('\n');
+    for (const line of lines) {
+      if (line.startsWith('data: ')) {
+        try {
+          const data = JSON.parse(line.slice(6));
+          if (data.response) {
+            fullResponse += data.response;
+            console.log('fullResponse', fullResponse);
+            const chatMsgItem: IChatItemMsg = {
+              content: fullResponse,
+              role: 'assistant',
+              id: id,
+              date: '',
+            };
+            onMessage(chatMsgItem);
+          }
+        } catch (e) {
+          console.error('解析JSON时出错:', e);
+        }
+      }
+    }
+  }
+  const chatMsgItem2: IChatItemMsg = getChatResponseJsonFromResponseText(fullChunk);
+  onSuccess({ ...chatMsgItem2, id: id });
+};
+
+export const cahtActionH5 = async ({
+  id,
+  knowledgeListSelect,
+  question,
+  onMessage,
+  onSuccess,
+}: {
+  id: string; // msgid
+  question: string;
+  knowledgeListSelect: string[];
+  onMessage: (chatMsgItem: IChatItemMsg) => void;
+  onSuccess: (chatMsgItem: IChatItemMsg) => void;
+}) => {
+  const response = await fetch(`${BaseUrl}/api/local_doc_qa/local_doc_chat`, {
+    method: 'POST',
+    headers: {
+      Accept: 'text/event-stream,application/json, text/event-stream',
+      'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8,zh-TW;q=0.7,mt;q=0.6,pl;q=0.5',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      user_id: 'zzp',
+      kb_ids: knowledgeListSelect,
+      history: [],
+      question,
+      streaming: true,
+      networking: false,
+      product_source: 'saas',
+      rerank: false,
+      only_need_search_results: false,
+      hybrid_search: true,
+      max_token: 1024,
+      api_base: '',
+      api_key: '',
+      model: '',
+      api_context_length: 8192,
+      chunk_size: 800,
+      top_p: 1,
+      top_k: 30,
+      temperature: 0.5,
+    }),
+  });
 
   const reader = (response as any).body.getReader();
   const decoder = new TextDecoder();
@@ -199,3 +283,13 @@ export function base64ToBlobUrl(base64Data: string, mimeType: string) {
   return blobUrl;
 }
 
+export function filterSourceDocuments(source_documents: any) {
+  const source_documents_map: any = {};
+  for (const source_documents_item of source_documents) {
+    const { file_id } = source_documents_item;
+    if (!source_documents_map[file_id]) {
+      source_documents_map[file_id] = source_documents_item;
+    }
+  }
+  return Object.values(source_documents_map).slice(0, 3);
+}
