@@ -33,6 +33,12 @@ export default [
     component: './Chat',
   },
   {
+    path: '/chat-h5',
+    layout: false,
+    name: 'chat-h5',
+    component: './ChatH5',
+  },
+  {
     path: '*',
     layout: false,
     component: './404',

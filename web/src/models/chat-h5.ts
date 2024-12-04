@@ -1,16 +1,8 @@
-import { api_list_knowledge_base } from '@/services';
-import { cahtAction, generateUUID, scrollChatBodyToBottom } from '@/utils';
+import { cahtActionH5, generateUUID, scrollH5ChatBodyToBottom } from '@/utils';
 import { useEffect, useState } from 'react';
 
-const updateFlagKey = 'code_update_2024_11_10';
-if (!localStorage.getItem(updateFlagKey)) {
-  localStorage.clear();
-  localStorage.setItem(updateFlagKey, 'true');
-}
-
-export const chat_store_key = 'Chat_Store';
-export const chat_store_active_key = 'Chat_Store_Active';
-export const chat_store_knowledge_list_select_key = 'Chat_Store_Knowledge_List_Select';
+const activeKnowledgeList = H5_DEFAULT_ACTIVE_KNOWLEDGE_LIST;
+export const chat_store_key = 'Chat_Store_H5';
 
 export interface IChatItemMsg {
   content: string;
@@ -18,7 +10,6 @@ export interface IChatItemMsg {
   id: string;
   date: string;
   source_documents?: any[];
-  show_images?: any[];
   raw?: any;
 }
 
@@ -46,30 +37,16 @@ const testChatStore: IChatStore = {
 };
 
 export default () => {
-  // 管理 知识库 数据
-  const [knowledgeList, setKnowledgeList] = useState<IKnowledgeListItem[]>([]);
-  const [knowledgeListSelect, setKnowledgeListSelect] = useState<string[]>([]);
-  const [knowledgeActiveId, setKnowledgeActiveId] = useState();
-
   // 管理 chat 数据
   const [chatStore, setChatStore] = useState<IChatStore>(testChatStore);
   const [activeChat, setActiveChat] = useState('demo');
   console.log('chatStore', chatStore);
   useEffect(() => {
     const _chatStore = localStorage.getItem(chat_store_key);
-    const _activeChat = localStorage.getItem(chat_store_active_key);
-    const _knowledgeListSelect = localStorage.getItem(chat_store_knowledge_list_select_key);
     if (_chatStore) {
       const _chatStoreJson = JSON.parse(_chatStore);
       setChatStore(_chatStoreJson);
       setActiveChat(Object.keys(_chatStoreJson)[0]);
-    }
-    if (_activeChat) {
-      setActiveChat(_activeChat);
-    }
-    if (_knowledgeListSelect) {
-      const _knowledgeListSelectJson = JSON.parse(_knowledgeListSelect);
-      setKnowledgeListSelect(_knowledgeListSelectJson);
     }
   }, []);
 
@@ -77,32 +54,13 @@ export default () => {
     localStorage.setItem(chat_store_key, JSON.stringify(chatStore));
   }, [chatStore]);
 
-  useEffect(() => {
-    localStorage.setItem(chat_store_active_key, activeChat);
-  }, [activeChat]);
-
-  useEffect(() => {
-    localStorage.setItem(chat_store_knowledge_list_select_key, JSON.stringify(knowledgeListSelect));
-  }, [knowledgeListSelect]);
-
-  useEffect(() => {
-    reloadKnowledgeList();
-  }, []);
-
-  const reloadKnowledgeList = () => {
-    api_list_knowledge_base().then((res: any) => {
-      console.log('api_list_knowledge_base', res);
-      setKnowledgeList(res?.data || []);
-    });
-  };
-
   // 新增聊天数据
   const addChatMsg = (id: string, msg: IChatItemMsg) => {
     setChatStore((chatStore: any) => {
       const _chatStore = JSON.parse(JSON.stringify(chatStore));
       _chatStore[id].messages.push(msg);
       setTimeout(() => {
-        scrollChatBodyToBottom(id, true);
+        scrollH5ChatBodyToBottom(id, true);
       }, 100);
       return _chatStore;
     });
@@ -122,8 +80,8 @@ export default () => {
       return _chatStore;
     });
     setTimeout(() => {
-      scrollChatBodyToBottom(id, true);
-    }, 0);
+      scrollH5ChatBodyToBottom(id, true);
+    }, 100);
   };
 
   /**
@@ -167,9 +125,9 @@ export default () => {
       date: '',
     };
     addChatMsg(chatid, chatMsgItem);
-    cahtAction({
+    cahtActionH5({
       id: msgId,
-      knowledgeListSelect,
+      knowledgeListSelect: activeKnowledgeList,
       question: userMsgValue,
       onMessage: (chatMsgItem: IChatItemMsg) => {
         updateChatMsg(chatid, chatMsgItem);
@@ -194,66 +152,14 @@ export default () => {
     }
   };
 
-  const addChatWindow = () => {
-    setChatStore((chatStore) => {
-      console.log('新建对话窗口');
-      const id = generateUUID();
-      const _chatStore: any = JSON.parse(JSON.stringify(chatStore));
-      const chatItem: IChatItem = {
-        id,
-        state: 'success',
-        messages: [],
-      };
-      _chatStore[id] = chatItem;
-      setActiveChat(id);
-      return _chatStore;
-    });
-  };
-
-  const deleteChatWindow = (id: string) => {
-    setChatStore((chatStore) => {
-      console.log('删除对话窗口', id);
-      const _chatStore: any = JSON.parse(JSON.stringify(chatStore));
-      if (Object.keys(_chatStore).length === 1) {
-        console.log('最后一条对话，不能删除');
-        return _chatStore;
-      }
-      if (activeChat === id) {
-        delete _chatStore[id];
-        const _id = Object.keys(_chatStore)[0];
-        setActiveChat(_id);
-      } else {
-        delete _chatStore[id];
-      }
-      return _chatStore;
-    });
-  };
-
-  const changeChatWindow = (id: string) => {
-    setActiveChat(id);
-    setTimeout(() => {
-      scrollChatBodyToBottom(id, false);
-    }, 50);
-  };
-
   return {
     chatStore,
     addChatMsg,
     updateChatMsg,
     deleteChatStore,
     setChatItemState,
-    knowledgeList,
-    setKnowledgeList,
-    knowledgeListSelect,
-    setKnowledgeListSelect,
-    knowledgeActiveId,
-    setKnowledgeActiveId,
-    reloadKnowledgeList,
     questionAction,
     reQuestionAction,
-    addChatWindow,
-    deleteChatWindow,
-    changeChatWindow,
     activeChat,
   };
 };

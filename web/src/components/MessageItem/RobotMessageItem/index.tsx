@@ -29,7 +29,7 @@ const Index: React.FC<IProps> = ({ messageItem }) => {
         </div>
         <div className={styles.messageItemContent} style={{ background: '#fff' }}>
           <MarkdownContent content={messageItem.content} />
-          {sourceDocsCount && sourceDocsCount > 0 && (
+          {!!(sourceDocsCount && sourceDocsCount > 0) && (
             <Collapse
               ghost
               bordered={false}
