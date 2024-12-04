@@ -1,7 +1,7 @@
 import { cahtActionH5, generateUUID, scrollH5ChatBodyToBottom } from '@/utils';
 import { useEffect, useState } from 'react';
 
-const activeKnowledgeList = ['KBed4e7f730e6048aca545a4b83dcbf8f9_240625'];
+const activeKnowledgeList = H5_DEFAULT_ACTIVE_KNOWLEDGE_LIST;
 export const chat_store_key = 'Chat_Store_H5';
 
 export interface IChatItemMsg {
