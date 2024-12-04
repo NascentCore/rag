@@ -1,6 +1,6 @@
 from qanything_kernel.configs.model_config import VECTOR_SEARCH_TOP_K, VECTOR_SEARCH_SCORE_THRESHOLD, \
     PROMPT_TEMPLATE, STREAMING, SYSTEM, INSTRUCTIONS, SIMPLE_PROMPT_TEMPLATE, CUSTOM_PROMPT_TEMPLATE, \
-    LOCAL_RERANK_MODEL_NAME, LOCAL_EMBED_MAX_LENGTH
+    LOCAL_RERANK_MODEL_NAME, LOCAL_EMBED_MAX_LENGTH, SYSTEM_CN, INSTRUCTIONS_CN, INSTRUCTIONS2, SQL_PROMPT_TEMPLATE
 from typing import List, Tuple, Union, Dict
 import time
 from scipy.spatial import cKDTree
@@ -366,7 +366,7 @@ class LocalDocQA:
                                          temperature, api_base, api_key, api_context_length, top_p, top_k, web_chunk_size,
                                          chat_history=None, streaming: bool = STREAMING, rerank: bool = False,
                                          only_need_search_results: bool = False, need_web_search=False,
-                                         hybrid_search=False):
+                                         hybrid_search=False,using_model_knowledge=False,text_to_sql=False):
         custom_llm = OpenAILLM(model, max_token, api_base, api_key, api_context_length, top_p, temperature)
         if chat_history is None:
             chat_history = []
@@ -500,6 +500,11 @@ class LocalDocQA:
         today = time.strftime("%Y-%m-%d", time.localtime())
         # 获取当前时间
         now = time.strftime("%H:%M:%S", time.localtime())
+        # 判断问题是中文还是英文
+        chinese_question = False
+        for char in query:
+            if "\u4e00" <= char <= "\u9fff":
+                chinese_question = True
 
         t1 = time.perf_counter()
         if source_documents:
@@ -508,11 +513,23 @@ class LocalDocQA:
                 # prompt_template = CUSTOM_PROMPT_TEMPLATE.format(custom_prompt=escaped_custom_prompt)
                 prompt_template = CUSTOM_PROMPT_TEMPLATE.replace("{{custom_prompt}}", custom_prompt)
             else:
-                # system_prompt = SYSTEM.format(today_date=today, current_time=now)
-                system_prompt = SYSTEM.replace("{{today_date}}", today).replace("{{current_time}}", now)
-                # prompt_template = PROMPT_TEMPLATE.format(system=system_prompt, instructions=INSTRUCTIONS)
-                prompt_template = PROMPT_TEMPLATE.replace("{{system}}", system_prompt).replace("{{instructions}}",
-                                                                                               INSTRUCTIONS)
+                if chinese_question:
+                    # system_prompt = SYSTEM.format(today_date=today, current_time=now)
+                    system_prompt = SYSTEM_CN.replace("{{today_date}}", today).replace("{{current_time}}", now)
+                else:
+                    system_prompt = SYSTEM.replace("{{today_date}}", today).replace("{{current_time}}", now)
+
+                if using_model_knowledge:
+                    # prompt_template = PROMPT_TEMPLATE.format(system=system_prompt, instructions=INSTRUCTIONS)
+                    prompt_template = PROMPT_TEMPLATE.replace("{{system}}", system_prompt).replace("{{instructions}}",
+                                                                                                        INSTRUCTIONS2)
+                else:
+                    if chinese_question:
+                        prompt_template = PROMPT_TEMPLATE.replace("{{system}}", system_prompt).replace("{{instructions}}",
+                                                                                                        INSTRUCTIONS_CN)
+                    else:
+                        prompt_template = PROMPT_TEMPLATE.replace("{{system}}", system_prompt).replace("{{instructions}}",
+                                                                                                        INSTRUCTIONS)
         else:
             if custom_prompt:
                 # escaped_custom_prompt = custom_prompt.replace('{', '{{').replace('}', '}}')
@@ -520,12 +537,21 @@ class LocalDocQA:
                 prompt_template = SIMPLE_PROMPT_TEMPLATE.replace("{{today}}", today).replace("{{now}}", now).replace(
                     "{{custom_prompt}}", custom_prompt)
             else:
-                simple_custom_prompt = """
-                - If you cannot answer based on the given information, you will return the sentence \"抱歉，已知的信息不足，因此无法回答。\".
-                """
+                if using_model_knowledge:
+                    simple_custom_prompt = """
+                    - If you cannot answer based on the given information, you need to answer based on your own knowledge, And combined with the context, but don't make up anything. If it is beyond your knowledge, you can answer "抱歉，已知的信息不足，因此无法回答。".
+                    """
+                else:
+                    simple_custom_prompt = """
+                    - 如果参考信息里没有问题的答案，请立即返回： \"抱歉，已知的信息不足，因此无法回答。\".
+                    """
+
                 # prompt_template = SIMPLE_PROMPT_TEMPLATE.format(today=today, now=now, custom_prompt=simple_custom_prompt)
                 prompt_template = SIMPLE_PROMPT_TEMPLATE.replace("{{today}}", today).replace("{{now}}", now).replace(
                     "{{custom_prompt}}", simple_custom_prompt)
+
+        if text_to_sql:
+            prompt_template = SQL_PROMPT_TEMPLATE.replace("{{question}}", query)
 
         # source_documents_for_show = copy.deepcopy(source_documents)
         # total_images_number = 0

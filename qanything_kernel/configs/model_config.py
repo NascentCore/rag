@@ -25,14 +25,39 @@ PDF_MODEL_PATH = os.path.join(root_path, "qanything_kernel/dependent_server/pdf_
 STREAMING = True
 
 SYSTEM = """
-You are a helpful assistant.
-You are always a reliable assistant that can answer questions with the help of external documents.
+K1/K3/K5 are the company’s space pod products. Detailed information about these products can be found in <DOCUMENTS> and </DOCUMENTS>.
+You are the company’s customer service representative, and I am the customer currently making an inquiry to you.
 Today's date is {{today_date}}. The current time is {{current_time}}.
+"""
+
+SYSTEM_CN = """
+K1/K3/K5 都是公司的太空舱产品，具体产品的详细信息来自<DOCUMENTS>和</DOCUMENTS>；
+你是公司的客服，我是客户，我现在正在向你咨询；
+今天日期是 {{today_date}}. 现在的时间是 {{current_time}}.
 """
 
 INSTRUCTIONS = """
 - All contents between <DOCUMENTS> and </DOCUMENTS> are reference information retrieved from an external knowledge base.
-- If you cannot answer based on the given information, you will return the sentence \"抱歉，检索到的参考信息并未提供充足的信息，因此无法回答。\".
+- If the reference information does not contain an answer to the question, please immediately respond: "The retrieved reference information does not provide sufficient details.".
+- Before answering, confirm the number of key points or pieces of information required, ensuring nothing is overlooked.
+- Return your answer in Markdown formatting, Respond using the same language as the content between <QUESTION> and </QUESTION> .
+- If the answer contains Chinese, please translate it into English and output only the English translation.
+- Now, answer the following question based on the above retrieved documents:
+{{question}}
+"""
+
+INSTRUCTIONS_CN = """
+- <DOCUMENTS> 和 </DOCUMENTS> 之间的所有内容均为从外部知识库检索到的参考信息。
+- 如果参考信息中不包含问题的答案，请立即回复：“检索到的参考信息并未提供充足的信息。”
+- 在回答之前，请确认所需关键点或信息的数量，确保没有遗漏。
+- 使用 Markdown 格式返回您的答案，并使用 <QUESTION> 和 </QUESTION> 之间的内容相同的语言作答。
+- 现在，请根据以上检索到的文档回答以下问题：
+{{question}}
+"""
+
+INSTRUCTIONS2 = """
+- All contents between <DOCUMENTS> and </DOCUMENTS> are reference information retrieved from an external knowledge base.
+- If you cannot answer based on the given information, you need to answer based on your own knowledge, And combined with the context, but don't make up anything. If it is beyond your knowledge, you can answer \"抱歉，已知的信息不足，因此无法回答。\".
 - Before answering, confirm the number of key points or pieces of information required, ensuring nothing is overlooked.
 - Now, answer the following question based on the above retrieved documents(Let's think step by step):
 {{question}}
@@ -44,13 +69,13 @@ PROMPT_TEMPLATE = """
 {{system}}
 </SYSTEM>
 
-<INSTRUCTIONS>
-{{instructions}}
-</INSTRUCTIONS>
-
 <DOCUMENTS>
 {{context}}
 </DOCUMENTS>
+
+<QUESTION>
+{{question}}
+</QUESTION>
 
 <INSTRUCTIONS>
 {{instructions}}
@@ -73,7 +98,6 @@ CUSTOM_PROMPT_TEMPLATE = """
 </INSTRUCTIONS>
 """
 
-
 SIMPLE_PROMPT_TEMPLATE = """
 - You are a helpful assistant. You can help me by answering my questions. You can also ask me questions.
 - Today's date is {{today}}. The current time is {{now}}.
@@ -82,6 +106,20 @@ SIMPLE_PROMPT_TEMPLATE = """
 - Now, answer the following question:
 {{question}}
 Return your answer in Markdown formatting, and in the same language as the question "{{question}}".
+"""
+
+SQL_PROMPT_TEMPLATE = """
+Database Schema:
+Tables:
+1. KnowledgeBase (id, kb_id, user_id, kb_name, latest_qa_time, latest_insert_time)
+2. User (id, user_id, user_name, creation_time)
+3. File (id, file_id, user_id, kb_id, file_name, status, content_length, file_location, chunk_size)
+4. QaLogs (id, qa_id, user_id, kb_ids, query, model, prompt, result, timestamp)
+
+- 请仅返回sql语句
+Question: {{question}}
+
+SQL Query:
 """
 
 # 缓存知识库数量
