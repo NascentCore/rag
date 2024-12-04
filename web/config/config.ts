@@ -7,7 +7,7 @@ const { REACT_APP_ENV = 'dev' } = process.env;
 
 export default defineConfig({
   define: {
-    API_BASE_URL: 'http://appjob-a0314fb1-e511-4bb9-a63f-34f6174558af.llm.sxwl.ai:30005',  // HTTP 请求 BaseURl
+    API_BASE_URL: `${window.location.origin.replace('web.', '')}`,  // HTTP 请求 BaseURl
     H5_DEFAULT_ACTIVE_KNOWLEDGE_LIST: ['KBed4e7f730e6048aca545a4b83dcbf8f9_240625'],   // h5 页面默认使用的知识库列表
   },
   hash: true,

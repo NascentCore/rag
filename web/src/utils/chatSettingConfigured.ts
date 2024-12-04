@@ -99,6 +99,8 @@ export const getActiveChatSettingConfigured = () => {
     params.networking = activeItem.capabilities.includes('networkSearch');
     params.only_need_search_results = activeItem.capabilities.includes('onlySearch');
     params.rerank = activeItem.capabilities.includes('rerank');
+    params.using_model_knowledge = activeItem.capabilities.includes('llm');
+    params.text_to_sql = activeItem.capabilities.includes('sql');
   }
   return params;
 };

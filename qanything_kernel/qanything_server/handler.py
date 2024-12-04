@@ -647,6 +647,8 @@ async def local_doc_chat(req: request):
     history = safe_get(req, 'history', [])
     only_need_search_results = safe_get(req, 'only_need_search_results', False)
     need_web_search = safe_get(req, 'networking', False)
+    using_model_knowledge = safe_get(req, "using_model_knowledge", False)
+    text_to_sql = safe_get(req, "text_to_sql", False)
 
     api_base = safe_get(req, 'api_base', '')
     # 如果api_base中包含0.0.0.0或127.0.0.1或localhost，替换为GATEWAY_IP
@@ -709,6 +711,8 @@ async def local_doc_chat(req: request):
     debug_logger.info("temperature: %s", temperature)
     debug_logger.info("hybrid_search: %s", hybrid_search)
     debug_logger.info("web_chunk_size: %s", web_chunk_size)
+    debug_logger.info("using_model_knowledge: %s", using_model_knowledge)
+    debug_logger.info("text_to_sql: %s", text_to_sql)
 
     time_record = {}
     if kb_ids:
@@ -758,7 +762,9 @@ async def local_doc_chat(req: request):
                                                                                     api_key=api_key,
                                                                                     api_context_length=api_context_length,
                                                                                     top_p=top_p,
-                                                                                    top_k=top_k
+                                                                                    top_k=top_k,
+                                                                                    using_model_knowledge=using_model_knowledge,
+                                                                                    text_to_sql=text_to_sql
                                                                                     ):
                 chunk_data = resp["result"]
                 if not chunk_data:
@@ -839,7 +845,9 @@ async def local_doc_chat(req: request):
                                                                            api_key=api_key,
                                                                            api_context_length=api_context_length,
                                                                            top_p=top_p,
-                                                                           top_k=top_k
+                                                                           top_k=top_k,
+                                                                           using_model_knowledge=using_model_knowledge,
+                                                                           text_to_sql=text_to_sql
                                                                            ):
             pass
         if only_need_search_results:
@@ -910,17 +918,17 @@ https://qanything.youdao.com
         "description": "上传网页链接，自动爬取网页内容，需要指定知识库名称",
     },
     {
-        "api": "/api/local_doc_qa/local_doc_chat" 
+        "api": "/api/local_doc_qa/local_doc_chat"
         "name": "问答接口",
         "description": "知识库问答接口，指定知识库名称，上传用户问题，通过传入history支持多轮对话",
     },
     {
-        "api": "/api/local_doc_qa/list_files" 
+        "api": "/api/local_doc_qa/list_files"
         "name": "文件列表",
         "description": "列出指定知识库下的所有文件名，需要指定知识库名称",
     },
     {
-        "api": "/api/local_doc_qa/delete_files" 
+        "api": "/api/local_doc_qa/delete_files"
         "name": "删除文件",
         "description": "删除指定知识库下的指定文件，需要指定知识库名称",
     },

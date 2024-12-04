@@ -7,7 +7,7 @@ const Settings: ProLayoutProps & {
   pwa?: boolean;
   logo?: string;
 } = {
-  title: '国研科技',
+  title: '算想未来',
   navTheme: 'light',
   colorPrimary: '#722ED1',
   layout: 'top',

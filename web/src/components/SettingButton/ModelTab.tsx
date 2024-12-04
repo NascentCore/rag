@@ -20,6 +20,39 @@ const Index: React.FC<any> = ({ handleCancel }) => {
 
   const [form] = Form.useForm();
 
+  const capabilitiesOptions = [
+    {
+      value: 'networkSearch',
+      label: '联网检索',
+      tooltip: '接入互联网，会在需要时通过互联网搜集资料',
+    },
+    {
+      value: 'mixedSearch',
+      label: '混合检索',
+      tooltip: '使用向量检索与全文检索的综合结果返回',
+    },
+    {
+      value: 'onlySearch',
+      label: '仅检索模式',
+      tooltip: '此模式不会返回说明文字',
+    },
+    {
+      value: 'rerank',
+      label: '检索增强',
+      tooltip: '开启二阶段检索（rerank），会大幅增加检索耗时',
+    },
+    {
+      value: 'llm',
+      label: 'LLM推理',
+      tooltip: '当检索内容中未包含答案时，使用LLM模型自身的能力回答',
+    },
+    {
+      value: 'sql',
+      label: 'SQL查询',
+      tooltip: '将自然语言转换为SQL查询并展示结果',
+    },
+  ];
+
   const changeSelectModel = (modelType?: string) => {
     const chatSettingConfiguredList = getChatSettingConfigured();
     const modelOptions = chatSettingConfiguredList.map((x: any) => ({
@@ -243,22 +276,17 @@ const Index: React.FC<any> = ({ handleCancel }) => {
         >
           <SliderValueInput min={0} max={10} />
         </Form.Item>
-        <Form.Item name="capabilities" label={'模型能力'}>
-          <Checkbox.Group>
-            <Checkbox value="networkSearch" style={{ lineHeight: '32px' }}>
-              联网检索
-            </Checkbox>
-            <Checkbox value="mixedSearch" style={{ lineHeight: '32px' }}>
-              混合检索
-            </Checkbox>
-            <Checkbox value="onlySearch" style={{ lineHeight: '32px' }}>
-              仅检索模式
-            </Checkbox>
-            <Checkbox value="rerank" style={{ lineHeight: '32px' }}>
-              检索增强
-            </Checkbox>
-          </Checkbox.Group>
-        </Form.Item>
+        <Form.Item name="capabilities" label="模型能力">
+            <Checkbox.Group>
+              {capabilitiesOptions.map((option) => (
+                <Checkbox key={option.value} value={option.value} style={{ lineHeight: '32px' }}>
+                  <Tooltip title={<div style={{ color: '#333' }}>{option.tooltip}</div>} color="#fff">
+                    <span>{option.label}</span>
+                  </Tooltip>
+                </Checkbox>
+              ))}
+            </Checkbox.Group>
+          </Form.Item>
       </Form>
       {modelTypeValueWatch === '自定义模型配置' && (
         <Button type={'primary'} onClick={saveCustomerConfig}>

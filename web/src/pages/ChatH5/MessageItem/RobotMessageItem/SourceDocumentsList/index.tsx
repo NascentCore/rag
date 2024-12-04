@@ -62,7 +62,7 @@ const SourceDocumentsList: React.FC<IProps> = ({ messageItem }) => {
           setIsModalOpen(false);
         }}
         footer={null}
-        width={isMobile ? '100vw' : '70vw'}
+        width={isMobile ? '100vw' : '100vw'}
         styles={{
           content: {
             top: -80,

@@ -2,7 +2,7 @@ import { SubmitKey } from './interface';
 
 const Key = 'CommonSettingConfigured';
 
-const initCommonSettingConfigured = { submitKey: SubmitKey.Enter, webSiteTitle: '国研科技' };
+const initCommonSettingConfigured = { submitKey: SubmitKey.Enter, webSiteTitle: '算想未来' };
 
 export const saveCommonSettingConfigured = (data: any) => {
   localStorage.setItem(Key, JSON.stringify(data));
