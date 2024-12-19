@@ -60,6 +60,8 @@ const Index: React.FC<IProps> = ({ file_id, file_name }) => {
         return <ImagePreview blobUrl={fileObject.blobUrl} />;
       case 'jpeg':
         return <ImagePreview blobUrl={fileObject.blobUrl} />;
+      case 'JPEG':
+        return <ImagePreview blobUrl={fileObject.blobUrl} />;
       case 'png':
         return <ImagePreview blobUrl={fileObject.blobUrl} />;
       default:

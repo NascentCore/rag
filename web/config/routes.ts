@@ -24,7 +24,7 @@ export default [
   },
   {
     path: '/',
-    redirect: '/chat',
+    redirect: '/chat-h5',
   },
   {
     path: '/chat',

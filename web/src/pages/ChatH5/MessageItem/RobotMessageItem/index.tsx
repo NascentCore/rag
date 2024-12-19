@@ -25,7 +25,7 @@ const Index: React.FC<IProps> = ({ messageItem }) => {
         <div className={styles.messageItemContent} style={{ background: '#2c2c2e', color: '#fff' }}>
           <MarkdownContent content={messageItem.content} />
           {/* 引用图片 */}
-          {!!(show_images && show_images.length > 0) && <ImageList show_images={show_images} />}
+          {/* {!!(show_images && show_images.length > 0) && <ImageList show_images={show_images} />} */}
           {/* 数据来源 */}
           {!!(sourceDocsCount && sourceDocsCount > 0) && (
             <>

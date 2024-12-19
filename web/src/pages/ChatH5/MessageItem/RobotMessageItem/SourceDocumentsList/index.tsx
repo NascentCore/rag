@@ -7,6 +7,7 @@ import { base64ToBlobUrl, FileMimeTypeMap, filterSourceDocuments, getFileExtensi
 import DownloadFileButton from './DownloadFileButton';
 import { MarkdownContent } from '@/components/MarkdownContent';
 import styles from './index.less';
+import { question } from 'mermaid/dist/rendering-util/rendering-elements/shapes/question';
 const isMobile = window.screen.width <= 768;
 
 interface IDocumentItem {
