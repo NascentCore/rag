@@ -145,22 +145,22 @@ export const cahtActionH5 = async ({
       user_id: 'zzp',
       kb_ids: knowledgeListSelect,
       history: [],
-      question,
+      question: question.includes('产品图片') ? '产品图片' : question.includes('brochure') ? 'do you have the detailed information' : question.includes('宣传手册') ? '有详细资料吗' : question,
       streaming: true,
       networking: false,
       product_source: 'saas',
       rerank: false,
       only_need_search_results: false,
       hybrid_search: true,
-      max_token: 1024,
-      api_base: '',
-      api_key: '',
-      model: '',
-      api_context_length: 8192,
+      max_token: 512,
+      api_base: 'https://ark.cn-beijing.volces.com/api/v3/',
+      api_key: 'ff9ed2dd-cdf0-40d4-b4ec-d3aa19e2bd0b',
+      model: 'ep-20240721110948-mdv29',
+      api_context_length: 14336,
       chunk_size: 800,
       top_p: 1,
       top_k: 30,
-      temperature: 0.5,
+      temperature: 0.01,
     }),
   });
 
@@ -285,11 +285,57 @@ export function base64ToBlobUrl(base64Data: string, mimeType: string) {
 
 export function filterSourceDocuments(source_documents: any) {
   const source_documents_map: any = {};
+
   for (const source_documents_item of source_documents) {
-    const { file_id } = source_documents_item;
+    const { file_id, file_name, retrieval_query } = source_documents_item;
+
+    // 提取 query 中所有 k/K 加数字 或 m/M 加数字（忽略大小写）
+    const queryPattern = /(k\d+|m\d+)/gi; // 全局匹配，忽略大小写
+    const queryMatches = retrieval_query.match(queryPattern);
+    const queryMatchValues = queryMatches ? queryMatches.map((v) => v.toLowerCase()) : [];
+
+    // 如果提取到了多个 k/M 数字，文件名中包含任意一项即可
+    if (queryMatchValues.length > 0) {
+      const fileNameLower = file_name ? file_name.toLowerCase() : "";
+      const anyMatchIncluded = queryMatchValues.some((match) =>
+        fileNameLower.includes(match)
+      );
+      if (!anyMatchIncluded) {
+        continue; // 如果文件名不包含任意一个匹配项，跳过
+      }
+    }
+
+    if (retrieval_query.includes('联系方式') || retrieval_query.includes('contact information')) {
+      const isTure = file_name && file_name.includes('产品介绍');
+      if (!isTure) {
+        continue;
+      }
+    }
+
+    if (retrieval_query.includes('哪些产品')) {
+      const isTure = file_name && /\.(jpg|jpeg)$/.test(file_name.toLowerCase());
+      if (!isTure) {
+        continue;
+      }
+    }
+
+    if (retrieval_query.includes('产品图片') || retrieval_query.includes('product pictures')) {
+      const isTure = file_name && /\.(pdf)$/.test(file_name.toLowerCase());
+      if (!isTure) {
+        continue;
+      }
+    }
+
+    if (retrieval_query.includes('详细资料') || retrieval_query.includes('宣传手册')) {
+      const isTure = file_name && /\.(xls|xlsx)$/.test(file_name.toLowerCase());
+      if (!isTure) {
+        continue;
+      }
+    }
+
     if (!source_documents_map[file_id]) {
       source_documents_map[file_id] = source_documents_item;
     }
   }
-  return Object.values(source_documents_map).slice(0, 3);
+  return Object.values(source_documents_map);
 }
