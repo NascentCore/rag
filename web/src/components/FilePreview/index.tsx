@@ -17,6 +17,7 @@ const Index: React.FC<IProps> = ({ file_id, file_name }) => {
   console.log('FilePreview render', file_id);
   const [fileObject, setFileObject] = useState<any>();
   useEffect(() => {
+    setFileObject(void 0);
     if (file_id) {
       api_get_file_base64({ file_id, user_id: 'zzp' }).then((res) => {
         console.log('api_get_file_base64', res);
