@@ -54,6 +54,34 @@ export const getChatResponseJsonFromResponseText = (responseText: string) => {
   return chatMsgItem;
 };
 
+export const getChatResponseJsonFromResponseText_modalType = (responseText: string) => {
+  let json: any = {};
+  try {
+    const data = JSON.parse(responseText);
+    json = data;
+  } catch (e) {
+    console.error('解析JSON时出错:', e);
+  }
+  const { choices } = json;
+  let content = '';
+  try {
+    content = choices[0].message.content;
+  } catch (error) {
+    console.error(error);
+  }
+  const msgId = generateUUID();
+  const chatMsgItem: IChatItemMsg = {
+    content,
+    source_documents: [],
+    show_images: [],
+    role: 'assistant',
+    id: msgId,
+    date: '',
+    raw: json,
+  };
+  return chatMsgItem;
+};
+
 export const cahtAction = async ({
   id,
   knowledgeListSelect,
@@ -145,7 +173,13 @@ export const cahtActionH5 = async ({
       user_id: 'zzp',
       kb_ids: knowledgeListSelect,
       history: [],
-      question: question.includes('产品图片') ? '产品图片' : question.includes('brochure') ? 'do you have the detailed information' : question.includes('宣传手册') ? '有详细资料吗' : question,
+      question: question.includes('产品图片')
+        ? '产品图片'
+        : question.includes('brochure')
+        ? 'do you have the detailed information'
+        : question.includes('宣传手册')
+        ? '有详细资料吗'
+        : question,
       streaming: true,
       networking: false,
       product_source: 'saas',
@@ -199,6 +233,79 @@ export const cahtActionH5 = async ({
   onSuccess({ ...chatMsgItem2, id: id });
 };
 
+export const cahtActionH5_ModalType = async ({
+  id,
+  question,
+  onMessage,
+  onSuccess,
+}: {
+  id: string; // msgid
+  question: string;
+  onMessage: (chatMsgItem: IChatItemMsg) => void;
+  onSuccess: (chatMsgItem: IChatItemMsg) => void;
+}) => {
+  const response = await fetch(`/api/v1/chat/completions`, {
+    method: 'POST',
+    headers: {
+      Accept: 'text/event-stream,application/json, text/event-stream',
+      'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8,zh-TW;q=0.7,mt;q=0.6,pl;q=0.5',
+      'Content-Type': 'application/json',
+      Authorization: sessionStorage.getItem('chat-h5-model-token'),
+      //'Bearer eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI0YjgxMDczMmIxNWY0NzYxOTYyMGM4YmEyMDFiNTMwNSIsInN1YiI6InBsYXlncm91bmRAc3h3bC5haSIsInVzZXJfaWQiOiJ1c2VyLTc4ZGM1NTU3LTZiYjktNGMwZi05ZGQzLTIxZmE5YTc3MTM0OSIsInVzZXJpZCI6ODgsInVzZXJuYW1lIjoicGxheWdyb3VuZEBzeHdsLmFpIn0.RSyYZNQMH9LGrzo2qrDCwSNW97-8pEPi9fuAsU2SLzXRhD5Y5bNki8yCdHYG_WrfT1TR5bm3QO_gKBaX332xgQ',
+    },
+    body: JSON.stringify({
+      model: sessionStorage.getItem('chat-h5-model-model'), //'google/gemma-2b-it',
+      messages: [
+        {
+          role: 'user',
+          content: question,
+        },
+      ],
+    }),
+  });
+
+  const reader = (response as any).body.getReader();
+  const decoder = new TextDecoder();
+  let fullChunk = '';
+  let fullResponse = '';
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    const chunk = decoder.decode(value);
+    fullChunk += chunk;
+    console.log('chunk', chunk);
+    // const lines = chunk.split('\n');
+    // for (const line of lines) {
+    //   if (line.startsWith('data: ')) {
+    //     try {
+    //       const data = JSON.parse(line.slice(6));
+    //       if (data.response) {
+    //         fullResponse += data.response;
+    //         console.log('fullResponse', fullResponse);
+    //         const chatMsgItem: IChatItemMsg = {
+    //           content: fullResponse,
+    //           role: 'assistant',
+    //           id: id,
+    //           date: '',
+    //         };
+    //         onMessage(chatMsgItem);
+    //       }
+    //     } catch (e) {
+    //       console.error('解析JSON时出错:', e);
+    //     }
+    //   }
+    // }
+  }
+  const chatMsgItem2: IChatItemMsg = getChatResponseJsonFromResponseText_modalType(fullChunk);
+  const chatMsgItem: IChatItemMsg = {
+    content: '',
+    role: 'assistant',
+    id: id,
+    date: '',
+  };
+  onMessage(chatMsgItem);
+  onSuccess({ ...chatMsgItem2, id: id });
+};
 export function formatFileSize(bytes: number): string {
   if (bytes < 1024) {
     // 对于小于1KB的文件大小，直接返回字节
@@ -296,10 +403,8 @@ export function filterSourceDocuments(source_documents: any) {
 
     // 如果提取到了多个 k/M 数字，文件名中包含任意一项即可
     if (queryMatchValues.length > 0) {
-      const fileNameLower = file_name ? file_name.toLowerCase() : "";
-      const anyMatchIncluded = queryMatchValues.some((match) =>
-        fileNameLower.includes(match)
-      );
+      const fileNameLower = file_name ? file_name.toLowerCase() : '';
+      const anyMatchIncluded = queryMatchValues.some((match) => fileNameLower.includes(match));
       if (!anyMatchIncluded) {
         continue; // 如果文件名不包含任意一个匹配项，跳过
       }
@@ -338,4 +443,18 @@ export function filterSourceDocuments(source_documents: any) {
     }
   }
   return Object.values(source_documents_map);
+}
+
+export function getParameterByName(name: string, url?: string) {
+  let myUrl: any = url;
+  if (!url) myUrl = window.location.href;
+  const regex = new RegExp(`[?&]${name}(=([^&#]*)|&|#|$)`);
+  const results = regex.exec(myUrl);
+  if (!results) return null;
+  if (!results[2]) return '';
+  try {
+    return decodeURIComponent(results[2].replace(/\+/g, ' '));
+  } catch (e) {
+    return '';
+  }
 }

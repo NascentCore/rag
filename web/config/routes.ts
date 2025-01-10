@@ -39,6 +39,13 @@ export default [
     component: './ChatH5',
   },
   {
+    path: '/chat-h5-model',
+    layout: false,
+    name: 'chat-h5-model',
+    component: './ChatH5Model',
+  },
+  
+  {
     path: '*',
     layout: false,
     component: './404',

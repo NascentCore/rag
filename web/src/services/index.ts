@@ -1,7 +1,7 @@
 import { request } from '@umijs/max';
 import useSWR from 'swr';
 
-export const BaseUrl = `${window.location.origin.replace('web.', '')}`;
+export const BaseUrl = API_BASE_URL;
 export async function api_get_file_base64(data: { file_id: string; user_id: string }) {
   return request(`${BaseUrl}/api/local_doc_qa/get_file_base64`, {
     method: 'POST',
